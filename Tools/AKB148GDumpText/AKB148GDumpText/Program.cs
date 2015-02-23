@@ -21,106 +21,76 @@ namespace AKB148GDumpText
         {
             if (args[0] == "-d")
             {
-                CheckStart(args[1], args[2]);
+                Dump(args[1], args[2]);
                 //Console.ReadKey();
             }
             else if (args[0] == "-i")
             {
                 Insert(args[1], args[2]);
-                //Console.ReadKey();
             }
-        }
-
-        static void CheckStart(string inFile, string outFile)
-        {
-
-            byte[] ByteBuffer = File.ReadAllBytes(inFile);
-            byte[] StringBytes = Encoding.UTF8.GetBytes("__m");
-            for (int i = 0; i <= (ByteBuffer.Length - StringBytes.Length); i++)
+            else
             {
-                if (ByteBuffer[i] == StringBytes[0])
-                {
-                    if (ByteBuffer[i + 1] == StringBytes[1])
-                    {
-                        if (ByteBuffer[i + 2] == StringBytes[2])
-                        {
-                            Console.WriteLine("String was found at offset {0}", i);
-                            Dump(inFile, i, outFile);
-                        }
-                    }
-                }
+                Console.WriteLine("Usage:\n");
+                Console.WriteLine("Dump: AKB148GDumpText.exe -d FILE.asb Script.txt\n");
+                Console.WriteLine("Insert: AKB148GDumpText.exe -i Script.txt FILE.asb \n");
             }
         }
-        static void Dump(string inFile, int offset, string outFile)
+        static void Dump(string inFile, string outFile)
         {
             using (BinaryReader reader = new BinaryReader(File.Open(inFile, FileMode.Open, FileAccess.Read)))
             {
-                reader.BaseStream.Position = offset;
-                //List<string> offlst = new List<string>();
-                long[] offlst = new long[1000];
-                int[] size = new int[1000];
-                List<byte[]> textLst = new List<byte[]>();
+                reader.BaseStream.Position = 52;
+                byte[] tmp = new byte[8];
+                tmp[0] = reader.ReadByte();
+                tmp[1] = reader.ReadByte();
+                if (!BitConverter.IsLittleEndian)
+                    Array.Reverse(tmp);
+                long tmpl = BitConverter.ToInt64(tmp, 0);
+                Console.WriteLine("Start position is at offset {0}", tmpl);
+                reader.BaseStream.Position = tmpl;
+                List<dialog> dlist = new List<dialog>();
                 List<byte> mahByteArray = new List<byte>();
-                int j = 0;
-                offlst[j] = reader.BaseStream.Position;
+                dialog d = new dialog();
+                d.offset = reader.BaseStream.Position;
                 while (reader.PeekChar() != -1)
                 {
                     if (reader.PeekChar() == 0x00)
                     {
                         mahByteArray.Add(reader.ReadByte());
-                        //mahByteArray.AddRange(System.Text.Encoding.UTF8.GetBytes("<END>"));
-                        textLst.Add(mahByteArray.ToArray());
-                        size[j] = mahByteArray.Count;
+                        d.text = System.Text.Encoding.UTF8.GetString(mahByteArray.ToArray());
+                        d.size = mahByteArray.Count;
+                        dlist.Add(d);
                         mahByteArray.Clear();
-                        j++;
-                        offlst[j] = reader.BaseStream.Position;
-                    }
-                    else if (reader.PeekChar() == 0x0A)
-                    {
-
-                        //mahByteArray.AddRange(System.Text.Encoding.UTF8.GetBytes("<LINEEND>"));
-                        mahByteArray.Add(reader.ReadByte());
-
+                        d = new dialog();
+                        d.offset = reader.BaseStream.Position;
                     }
                     else
                     {
-
                         mahByteArray.Add(reader.ReadByte());
                     }
                 }
                 using (BinaryWriter writer = new BinaryWriter(File.Open(outFile, FileMode.Create)))
                 {
-                    for(int i=2;i<textLst.Count-1;i++)
+                    foreach (dialog dl in dlist)
                     {
-                        if (textLst[i][0] == 0x40|| textLst[i][0] == 0x00 || Regex.IsMatch(System.Text.Encoding.UTF8.GetString(new byte[] { textLst[i][0], textLst[i][1] }), @"^\d+$"))
+                        int tmpnum;
+                        if (dl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x40 })) || dl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x00 })) || dl.text.StartsWith("pow( x,") || dl.text.StartsWith("__main") || dl.text.StartsWith("main") || dl.text.StartsWith("se")||int.TryParse(dl.text.Substring(0, 2), out tmpnum))
                         {
 
                         }
                         else
                         {
-                        writer.Write(System.Text.Encoding.UTF8.GetBytes(offlst[i].ToString()));
-                        writer.Write(System.Text.Encoding.UTF8.GetBytes(";"));
-                        writer.Write(System.Text.Encoding.UTF8.GetBytes(size[i].ToString()));
-                        writer.Write(System.Text.Encoding.UTF8.GetBytes(";"));
-                        
-                            foreach (byte b in textLst[i])
-                            {
-                                if (b == 0x00)
-                                {
-                                    writer.Write(System.Text.Encoding.UTF8.GetBytes("<END>"));
-                                }
-                                else if (b == 0x0A)
-                                {
-                                    writer.Write(System.Text.Encoding.UTF8.GetBytes("<LINEEND>"));
-                                }
-                                else
-                                {
-                                    writer.Write(b);
-                                }
-
-                            }
+                            string tmps = dl.text;
+                            tmps = tmps.Replace(System.Text.Encoding.UTF8.GetString(new byte[] { 0x0A }), "<LINEEND>");
+                            tmps = tmps.Replace(System.Text.Encoding.UTF8.GetString(new byte[] { 0x00 }), "<END>");
+                            writer.Write(System.Text.Encoding.UTF8.GetBytes(dl.offset.ToString()));
+                            writer.Write(System.Text.Encoding.UTF8.GetBytes(";"));
+                            writer.Write(System.Text.Encoding.UTF8.GetBytes(dl.size.ToString()));
+                            writer.Write(System.Text.Encoding.UTF8.GetBytes(";"));
+                            writer.Write(System.Text.Encoding.UTF8.GetBytes(tmps));
                             writer.Write(System.Text.Encoding.UTF8.GetBytes(Environment.NewLine));
                         }
+
                     }
                 }
 
@@ -131,7 +101,6 @@ namespace AKB148GDumpText
 
         static void Insert(string cmdFile, string inFile)
         {
-            string line;
             List<dialog> dList = new List<dialog>();
             System.IO.StreamReader file = new System.IO.StreamReader(cmdFile);
             while (!file.EndOfStream)
@@ -148,6 +117,7 @@ namespace AKB148GDumpText
                 dList.Add(d1);
             }
             file.Close();
+            Console.WriteLine("Writing to {0}", inFile);
             using (BinaryWriter writer = new BinaryWriter(File.Open(inFile, FileMode.Open)))
             {
                 foreach (dialog d in dList)
