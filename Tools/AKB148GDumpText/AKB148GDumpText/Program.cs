@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace AKB148GDumpText
@@ -89,31 +90,37 @@ namespace AKB148GDumpText
                 }
                 using (BinaryWriter writer = new BinaryWriter(File.Open(outFile, FileMode.Create)))
                 {
-                    int i = 0;
-                    foreach (byte[] s in textLst)
+                    for(int i=2;i<textLst.Count-1;i++)
                     {
+                        if (textLst[i][0] == 0x40|| textLst[i][0] == 0x00 || Regex.IsMatch(System.Text.Encoding.UTF8.GetString(new byte[] { textLst[i][0], textLst[i][1] }), @"^\d+$"))
+                        {
+
+                        }
+                        else
+                        {
                         writer.Write(System.Text.Encoding.UTF8.GetBytes(offlst[i].ToString()));
                         writer.Write(System.Text.Encoding.UTF8.GetBytes(";"));
                         writer.Write(System.Text.Encoding.UTF8.GetBytes(size[i].ToString()));
                         writer.Write(System.Text.Encoding.UTF8.GetBytes(";"));
-                        foreach (byte b in s)
-                        {
-                            if (b == 0x00)
+                        
+                            foreach (byte b in textLst[i])
                             {
-                                writer.Write(System.Text.Encoding.UTF8.GetBytes("<END>"));
-                            }
-                            else if (b == 0x0A)
-                            {
-                                writer.Write(System.Text.Encoding.UTF8.GetBytes("<LINEEND>"));
-                            }
-                            else
-                            {
-                                writer.Write(b);
-                            }
+                                if (b == 0x00)
+                                {
+                                    writer.Write(System.Text.Encoding.UTF8.GetBytes("<END>"));
+                                }
+                                else if (b == 0x0A)
+                                {
+                                    writer.Write(System.Text.Encoding.UTF8.GetBytes("<LINEEND>"));
+                                }
+                                else
+                                {
+                                    writer.Write(b);
+                                }
 
+                            }
+                            writer.Write(System.Text.Encoding.UTF8.GetBytes(Environment.NewLine));
                         }
-                        writer.Write(System.Text.Encoding.UTF8.GetBytes(Environment.NewLine));
-                        i++;
                     }
                 }
 
@@ -157,6 +164,13 @@ namespace AKB148GDumpText
                             mahByteArray.AddRange(System.Text.Encoding.ASCII.GetBytes(" "));
                         }
                         mahByteArray.Add(0x00);
+                        writer.Write(mahByteArray.ToArray(), 0, d.size);
+                    }
+                    else if (System.Text.Encoding.UTF8.GetBytes(d.text).Length > d.size)
+                    {
+                        var mahByteArray = new List<byte>();
+                        mahByteArray.AddRange(System.Text.Encoding.UTF8.GetBytes(d.text));
+                        mahByteArray.Insert(d.size, 0x00);
                         writer.Write(mahByteArray.ToArray(), 0, d.size);
                     }
                     else
