@@ -54,7 +54,7 @@ namespace ScriptEditor
                     items.Add(item);
                 }
 
-                using (BinaryWriter writer = new BinaryWriter(File.Open(sfd1.FileName, FileMode.OpenOrCreate)))
+                using (BinaryWriter writer = new BinaryWriter(File.Open(sfd1.FileName, FileMode.Create)))
                 {
                     foreach (dialog d in items)
                     {
