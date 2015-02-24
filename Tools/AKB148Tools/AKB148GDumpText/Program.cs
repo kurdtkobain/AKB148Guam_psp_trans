@@ -80,36 +80,9 @@ namespace AKB148GDumpText
                 }
             }
             Console.WriteLine("Writing to {0}", inFile);
-            using (BinaryWriter writer = new BinaryWriter(File.Open(inFile, FileMode.Open)))
+            if (!ASBTools.injectDialogList(inFile, dList)) 
             {
-                foreach (dialog d in dList)
-                {
-                    writer.BaseStream.Position = d.offset;
-                    if (System.Text.Encoding.UTF8.GetBytes(d.text).Length < d.size)
-                    {
-                        string s = d.text.Replace("\0", string.Empty);
-                        int pad = d.size - System.Text.Encoding.UTF8.GetBytes(d.text).Length;
-                        var mahByteArray = new List<byte>();
-                        mahByteArray.AddRange(System.Text.Encoding.UTF8.GetBytes(s));
-                        for (int i = 0; i < pad; i++)
-                        {
-                            mahByteArray.AddRange(System.Text.Encoding.ASCII.GetBytes(" "));
-                        }
-                        mahByteArray.Add(0x00);
-                        writer.Write(mahByteArray.ToArray(), 0, d.size);
-                    }
-                    else if (System.Text.Encoding.UTF8.GetBytes(d.text).Length > d.size)
-                    {
-                        var mahByteArray = new List<byte>();
-                        mahByteArray.AddRange(System.Text.Encoding.UTF8.GetBytes(d.text));
-                        mahByteArray.Insert(d.size, 0x00);
-                        writer.Write(mahByteArray.ToArray(), 0, d.size);
-                    }
-                    else
-                    {
-                        writer.Write(System.Text.Encoding.UTF8.GetBytes(d.text), 0, d.size);
-                    }
-                }
+                Console.WriteLine("ERROR!!!!!!\n");
             }
         }
 
