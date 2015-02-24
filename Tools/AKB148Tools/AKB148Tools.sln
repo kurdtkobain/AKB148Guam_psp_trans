@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptEditor", "ScriptEdito
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AKB148GDumpText", "AKB148GDumpText\AKB148GDumpText.csproj", "{A11D8836-C480-4F9A-970D-972D11A00DDA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AKB148GASBEdit", "AKB148GASBEdit\AKB148GASBEdit.csproj", "{5EEB6A9B-448D-42DA-B29E-ADCC2E858843}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{A11D8836-C480-4F9A-970D-972D11A00DDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A11D8836-C480-4F9A-970D-972D11A00DDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A11D8836-C480-4F9A-970D-972D11A00DDA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5EEB6A9B-448D-42DA-B29E-ADCC2E858843}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5EEB6A9B-448D-42DA-B29E-ADCC2E858843}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5EEB6A9B-448D-42DA-B29E-ADCC2E858843}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5EEB6A9B-448D-42DA-B29E-ADCC2E858843}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
