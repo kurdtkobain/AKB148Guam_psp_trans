@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -128,8 +129,9 @@ namespace AKB148GASBEdit
                 obj.text = textBox1.Text;
                 dataGridView1.Refresh();
             }
-            else {
-                MessageBox.Show("Can't insert text that is larger than original size.","ERROR",MessageBoxButtons.OK);
+            else
+            {
+                MessageBox.Show("Can't insert text that is larger than original size.", "ERROR", MessageBoxButtons.OK);
 
             }
 
@@ -200,8 +202,7 @@ namespace AKB148GASBEdit
                 List<dialog> final = new List<dialog>();
                 foreach (dialog dl in dlist)
                 {
-                    int tmpnum;
-                    if (dl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x40 })) || dl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x00 })) || dl.text.StartsWith("//") || dl.text.StartsWith("pow( x,") || dl.text.StartsWith("env") || dl.text.StartsWith("__main") || dl.text.StartsWith("main") || dl.text.StartsWith("se") || int.TryParse(dl.text.Substring(0, 2), out tmpnum))
+                    if (dl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x40 })) || dl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x00 })) || dl.text.StartsWith("//") || dl.text.StartsWith("pow( x,") || dl.text.StartsWith("env") || dl.text.StartsWith("__main") || dl.text.StartsWith("main") || dl.text.StartsWith("se") || Regex.IsMatch(dl.text, "([0-9]{2}_[0-9]{2}_[0-9]{4})"))
                     {
 
                     }
@@ -282,10 +283,9 @@ namespace AKB148GASBEdit
                 foreach (dialog dl in dlist)
                 {
 
-                    int tmpnum;
                     if (write)
                     {
-                        if (dl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x40 })) || dl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x00 })) || dl.text.StartsWith("//") || dl.text.StartsWith("env") || dl.text.StartsWith("pow( x,") || dl.text.StartsWith("__main") || dl.text.StartsWith("main") || dl.text.StartsWith("se") || int.TryParse(dl.text.Substring(0, 2), out tmpnum))
+                        if (dl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x40 })) || dl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x00 })) || dl.text.StartsWith("//") || dl.text.StartsWith("env") || dl.text.StartsWith("pow( x,") || dl.text.StartsWith("__main") || dl.text.StartsWith("main") || dl.text.StartsWith("se") || Regex.IsMatch(dl.text, "([0-9]{2}_[0-9]{2}_[0-9]{4})"))
                         {
 
                         }
@@ -303,7 +303,7 @@ namespace AKB148GASBEdit
                     }
                     else
                     {
-                        if (dl.text.Contains(filename.Substring(0,11)))
+                        if (dl.text.Contains(filename))
                         {
                             write = true;
                         }

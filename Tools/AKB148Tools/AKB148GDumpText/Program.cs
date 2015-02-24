@@ -46,7 +46,7 @@ namespace AKB148GDumpText
             {
                 reader.BaseStream.Position = 52;
                 long tmpl;
-                if (!BitConverter.IsLittleEndian)
+                if (BitConverter.IsLittleEndian)
                 {
                     tmpl = reader.ReadInt16();
                 }
@@ -84,8 +84,7 @@ namespace AKB148GDumpText
             {
                 foreach (dialog dl in dlist)
                 {
-                    int tmpnum;
-                    if (dl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x40 })) || dl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x00 })) || dl.text.StartsWith("//") || dl.text.StartsWith("pow( x,") || dl.text.StartsWith("__main") || dl.text.StartsWith("main") || dl.text.StartsWith("se") || int.TryParse(dl.text.Substring(0, 2), out tmpnum))
+                    if (dl.text.StartsWith("@") || dl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x00 })) || dl.text.StartsWith("//") || dl.text.StartsWith("env") || dl.text.StartsWith("pow( x,") || dl.text.StartsWith("__main") || dl.text.StartsWith("main") || dl.text.StartsWith("se") || Regex.IsMatch(dl.text,"([0-9]{2}_[0-9]{2}_[0-9]{4})"))
                     {
 
                     }
@@ -208,10 +207,9 @@ namespace AKB148GDumpText
                 string filename = "@" + Path.GetFileNameWithoutExtension(inFile);
                 foreach (dialog dl in dlist)
                 {
-                    int tmpnum;
                     if (write)
                     {
-                        if (dl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x40 })) || dl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x00 })) || dl.text.StartsWith("//") || dl.text.StartsWith("env") || dl.text.StartsWith("pow( x,") || dl.text.StartsWith("__main") || dl.text.StartsWith("main") || dl.text.StartsWith("se") || int.TryParse(dl.text.Substring(0, 2), out tmpnum))
+                        if (dl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x40 })) || dl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x00 })) || dl.text.StartsWith("//") || dl.text.StartsWith("env") || dl.text.StartsWith("pow( x,") || dl.text.StartsWith("__main") || dl.text.StartsWith("main") || dl.text.StartsWith("se") || Regex.IsMatch(dl.text, "([0-9]{2}_[0-9]{2}_[0-9]{4})"))
                         {
 
                         }
