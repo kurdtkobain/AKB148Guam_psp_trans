@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using AKB148GASBLib;
 
 namespace AKB148GASBEdit
 {
@@ -17,23 +18,6 @@ namespace AKB148GASBEdit
     {
         int selectedRowIndex;
         string currentFile;
-        bool onlyEvent;
-        class dialog : INotifyPropertyChanged
-        {
-            public long offset { get; set; }
-            public int size { get; set; }
-            public string text { get; set; }
-
-            public event PropertyChangedEventHandler PropertyChanged;
-
-            private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-            {
-                if (PropertyChanged != null)
-                {
-                    PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-                }
-            }
-        }
         public Main()
         {
             InitializeComponent();
@@ -92,14 +76,7 @@ namespace AKB148GASBEdit
 
         private void button2_Click(object sender, EventArgs e)
         {
-            if (onlyEvent)
-            {
-                loadEvent();
-            }
-            else
-            {
-                loadAll();
-            }
+            Load(checkBox1.Checked);
         }
 
         private void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
@@ -139,17 +116,12 @@ namespace AKB148GASBEdit
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-            if (checkBox1.Checked == false)
-            {
                 MessageBox.Show("For this to take effect you must reload file.", "Attention!", MessageBoxButtons.OK);
-            }
-            onlyEvent = checkBox1.Checked;
         }
 
 
-        private void loadAll()
+        private void Load(bool onlyevent)
         {
-            List<dialog> dlist = new List<dialog>();
             // Create an instance of the open file dialog box.
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
 
@@ -161,157 +133,9 @@ namespace AKB148GASBEdit
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 currentFile = openFileDialog1.FileName;
-                using (BinaryReader reader = new BinaryReader(File.Open(openFileDialog1.FileName, FileMode.Open, FileAccess.Read)))
-                {
-                    reader.BaseStream.Position = 52;
-                    long tmpl;
-                    if (BitConverter.IsLittleEndian)
-                    {
-                        tmpl = reader.ReadInt32();
-                    }
-                    else
-                    {
-                        byte[] tmpb = new byte[4];
-                        tmpb = reader.ReadBytes(2);
-                        Array.Reverse(tmpb);
-                        tmpl = BitConverter.ToInt16(tmpb, 0);
-                    }
-                    Console.WriteLine("Start position is at offset {0}", tmpl);
-                    reader.BaseStream.Position = tmpl;
-                    List<byte> mahByteArray = new List<byte>();
-                    dialog d = new dialog();
-                    d.offset = reader.BaseStream.Position;
-                    while (reader.PeekChar() != -1)
-                    {
-                        if (reader.PeekChar() == 0x00)
-                        {
-                            mahByteArray.Add(reader.ReadByte());
-                            d.text = System.Text.Encoding.UTF8.GetString(mahByteArray.ToArray());
-                            d.size = mahByteArray.Count;
-                            dlist.Add(d);
-                            mahByteArray.Clear();
-                            d = new dialog();
-                            d.offset = reader.BaseStream.Position;
-                        }
-                        else
-                        {
-                            mahByteArray.Add(reader.ReadByte());
-                        }
-                    }
-                }
-                List<dialog> final = new List<dialog>();
-                foreach (dialog dl in dlist)
-                {
-                    if (dl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x40 })) || dl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x00 })) || dl.text.StartsWith("//") || dl.text.StartsWith("pow( x,") || dl.text.StartsWith("env") || dl.text.StartsWith("__main") || dl.text.StartsWith("main") || dl.text.StartsWith("se") || Regex.IsMatch(dl.text, "([0-9]{2}_[0-9]{2}_[0-9]{4})"))
-                    {
-
-                    }
-                    else
-                    {
-                        dialog tmp = new dialog();
-                        tmp.offset = dl.offset;
-                        tmp.size = dl.size;
-                        string tmps = dl.text;
-                        tmps = tmps.Replace(System.Text.Encoding.UTF8.GetString(new byte[] { 0x0A }), "<LINEEND>");
-                        tmps = tmps.Replace(System.Text.Encoding.UTF8.GetString(new byte[] { 0x00 }), "<END>");
-                        tmp.text = tmps;
-                        final.Add(tmp);
-                    }
-                }
-                dlist.Clear();
+                List<dialog> dlist = ASBTools.getDialogList(openFileDialog1.FileName, true, onlyevent);
                 dataGridView1.ReadOnly = true;
-                dataGridView1.DataSource = final;
-                dataGridView1.AutoResizeColumns();
-            }
-        }
-
-        private void loadEvent()
-        {
-            List<dialog> dlist = new List<dialog>();
-            // Create an instance of the open file dialog box.
-            OpenFileDialog openFileDialog1 = new OpenFileDialog();
-
-            // Set filter options and filter index.
-            openFileDialog1.Filter = "AKB 1/48 Guam ASB File (.asb)|*.asb";
-            openFileDialog1.FilterIndex = 1;
-
-            // Process input if the user clicked OK.
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
-            {
-                currentFile = openFileDialog1.FileName;
-                using (BinaryReader reader = new BinaryReader(File.Open(openFileDialog1.FileName, FileMode.Open, FileAccess.Read)))
-                {
-                    reader.BaseStream.Position = 52;
-                    long tmpl;
-                    if (BitConverter.IsLittleEndian)
-                    {
-                        tmpl = reader.ReadInt32();
-                    }
-                    else
-                    {
-                        byte[] tmpb = new byte[4];
-                        tmpb = reader.ReadBytes(2);
-                        Array.Reverse(tmpb);
-                        tmpl = BitConverter.ToInt16(tmpb, 0);
-                    }
-                    Console.WriteLine("Start position is at offset {0}", tmpl);
-                    reader.BaseStream.Position = tmpl;
-                    List<byte> mahByteArray = new List<byte>();
-                    dialog d = new dialog();
-                    d.offset = reader.BaseStream.Position;
-                    while (reader.PeekChar() != -1)
-                    {
-                        if (reader.PeekChar() == 0x00)
-                        {
-                            mahByteArray.Add(reader.ReadByte());
-                            d.text = System.Text.Encoding.UTF8.GetString(mahByteArray.ToArray());
-                            d.size = mahByteArray.Count;
-                            dlist.Add(d);
-                            mahByteArray.Clear();
-                            d = new dialog();
-                            d.offset = reader.BaseStream.Position;
-                        }
-                        else
-                        {
-                            mahByteArray.Add(reader.ReadByte());
-                        }
-                    }
-                }
-                List<dialog> final = new List<dialog>();
-                bool write = false;
-                string filename = "@" + Path.GetFileNameWithoutExtension(currentFile);
-                foreach (dialog dl in dlist)
-                {
-
-                    if (write)
-                    {
-                        if (dl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x40 })) || dl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x00 })) || dl.text.StartsWith("//") || dl.text.StartsWith("env") || dl.text.StartsWith("pow( x,") || dl.text.StartsWith("__main") || dl.text.StartsWith("main") || dl.text.StartsWith("se") || Regex.IsMatch(dl.text, "([0-9]{2}_[0-9]{2}_[0-9]{4})"))
-                        {
-
-                        }
-                        else
-                        {
-                            dialog tmp = new dialog();
-                            tmp.offset = dl.offset;
-                            tmp.size = dl.size;
-                            string tmps = dl.text;
-                            tmps = tmps.Replace(System.Text.Encoding.UTF8.GetString(new byte[] { 0x0A }), "<LINEEND>");
-                            tmps = tmps.Replace(System.Text.Encoding.UTF8.GetString(new byte[] { 0x00 }), "<END>");
-                            tmp.text = tmps;
-                            final.Add(tmp);
-                        }
-                    }
-                    else
-                    {
-                        if (dl.text.Contains(filename))
-                        {
-                            write = true;
-                        }
-                    }
-                }
-                dlist.Clear();
-                dataGridView1.ReadOnly = true;
-                dataGridView1.DataSource = final;
+                dataGridView1.DataSource = dlist;
                 dataGridView1.AutoResizeColumns();
             }
         }

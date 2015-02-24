@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AKB148GDumpText", "AKB148GD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AKB148GASBEdit", "AKB148GASBEdit\AKB148GASBEdit.csproj", "{5EEB6A9B-448D-42DA-B29E-ADCC2E858843}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AKB148GASBLib", "AKB148GASBLib\AKB148GASBLib.csproj", "{D6CFEEF2-5AF3-4908-B5C7-67B62B87ED7C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{5EEB6A9B-448D-42DA-B29E-ADCC2E858843}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5EEB6A9B-448D-42DA-B29E-ADCC2E858843}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5EEB6A9B-448D-42DA-B29E-ADCC2E858843}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6CFEEF2-5AF3-4908-B5C7-67B62B87ED7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6CFEEF2-5AF3-4908-B5C7-67B62B87ED7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6CFEEF2-5AF3-4908-B5C7-67B62B87ED7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6CFEEF2-5AF3-4908-B5C7-67B62B87ED7C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

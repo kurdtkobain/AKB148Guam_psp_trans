@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("ScriptEditor")]
+[assembly: AssemblyTitle("AKB148GASBLib")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Hewlett-Packard Company")]
-[assembly: AssemblyProduct("ScriptEditor")]
+[assembly: AssemblyProduct("AKB148GASBLib")]
 [assembly: AssemblyCopyright("Copyright © Hewlett-Packard Company 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("75698203-f5b2-49fc-b85b-a40b0100609a")]
+[assembly: Guid("008d7ee1-fa16-4dfc-93a6-26bbd5c26e45")]
 
 // Version information for an assembly consists of the following four values:
 //
