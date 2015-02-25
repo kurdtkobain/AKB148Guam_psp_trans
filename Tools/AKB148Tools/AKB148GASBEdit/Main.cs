@@ -49,7 +49,7 @@ namespace AKB148GASBEdit
 
         private void button2_Click(object sender, EventArgs e)
         {
-            Load(checkBox1.Checked);
+            loadDialog();
         }
 
         private void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
@@ -93,7 +93,7 @@ namespace AKB148GASBEdit
         }
 
 
-        private void Load(bool onlyevent)
+        private void loadDialog()
         {
             // Create an instance of the open file dialog box.
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
@@ -106,9 +106,11 @@ namespace AKB148GASBEdit
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 currentFile = openFileDialog1.FileName;
-                List<dialog> dlist = ASBTools.getDialogList(openFileDialog1.FileName, true, onlyevent);
+                List<dialog> dlist = ASBTools.getDialogList(openFileDialog1.FileName, true, checkBox1.Checked);
+                List<dialog> objListOrder = dlist.OrderBy(o => o.offset).ToList();
+                dlist.Clear();
                 dataGridView1.ReadOnly = true;
-                dataGridView1.DataSource = dlist;
+                dataGridView1.DataSource = objListOrder;
                 dataGridView1.AutoResizeColumns();
             }
         }

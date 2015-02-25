@@ -12,6 +12,7 @@ namespace AKB148GASBLib
 {
     public class ASBTools
     {
+        static object fLock = new Object();
 
         public static List<dialog> getDialogList(string inFile, bool format = false, bool eventOnly = false)
         {
@@ -31,16 +32,15 @@ namespace AKB148GASBLib
                     Array.Reverse(tmpb);
                     tmpl = BitConverter.ToInt16(tmpb, 0);
                 }
-                Console.WriteLine("Start position is at offset {0}", tmpl);
                 reader.BaseStream.Position = tmpl;
                 List<byte> mahByteArray = new List<byte>();
                 dialog d = new dialog();
                 d.offset = reader.BaseStream.Position;
                 while (reader.PeekChar() != -1)
                 {
-                    if (reader.PeekChar() == 0x00)
+                    mahByteArray.Add(reader.ReadByte());
+                    if (mahByteArray[mahByteArray.Count - 1] == 0x00)
                     {
-                        mahByteArray.Add(reader.ReadByte());
                         d.text = System.Text.Encoding.UTF8.GetString(mahByteArray.ToArray());
                         d.size = mahByteArray.Count;
                         dlist.Add(d);
@@ -48,33 +48,32 @@ namespace AKB148GASBLib
                         d = new dialog();
                         d.offset = reader.BaseStream.Position;
                     }
-                    else
-                    {
-                        mahByteArray.Add(reader.ReadByte());
-                    }
                 }
             }
-            if (format)
+            if (format && !eventOnly)
             {
                 List<dialog> final = new List<dialog>();
-                foreach (dialog dl in dlist)
+                Parallel.ForEach(dlist, dtpl =>
                 {
-                    if (dl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x40 })) || dl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x00 })) || dl.text.StartsWith("//") || dl.text.StartsWith("pow( x,") || dl.text.StartsWith("env") || dl.text.StartsWith("__main") || dl.text.StartsWith("main") || dl.text.StartsWith("se") || Regex.IsMatch(dl.text, "([0-9]{2}_[0-9]{2}_[0-9]{4})"))
+                    if (dtpl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x40 })) || dtpl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x00 })) || dtpl.text.StartsWith("//") || dtpl.text.StartsWith("pow( x,") || dtpl.text.StartsWith("env") || dtpl.text.StartsWith("__main") || dtpl.text.StartsWith("main") || dtpl.text.StartsWith("se") || Regex.IsMatch(dtpl.text, "([0-9]{2}_[0-9]{2}_[0-9]{4})"))
                     {
 
                     }
                     else
                     {
                         dialog tmp = new dialog();
-                        tmp.offset = dl.offset;
-                        tmp.size = dl.size;
-                        string tmps = dl.text;
+                        tmp.offset = dtpl.offset;
+                        tmp.size = dtpl.size;
+                        string tmps = dtpl.text;
                         tmps = tmps.Replace(System.Text.Encoding.UTF8.GetString(new byte[] { 0x0A }), "<LINEEND>");
                         tmps = tmps.Replace(System.Text.Encoding.UTF8.GetString(new byte[] { 0x00 }), "<END>");
                         tmp.text = tmps;
-                        final.Add(tmp);
+                        lock (fLock)
+                        {
+                            final.Add(tmp);
+                        }
                     }
-                }
+                });
                 dlist.Clear();
                 return final;
             }
@@ -83,7 +82,7 @@ namespace AKB148GASBLib
                 List<dialog> final = new List<dialog>();
                 bool write = false;
                 string filename = "@" + Path.GetFileNameWithoutExtension(inFile);
-                foreach (dialog dl in dlist)
+                Parallel.ForEach(dlist, dl =>
                 {
 
                     if (write)
@@ -101,7 +100,10 @@ namespace AKB148GASBLib
                             tmps = tmps.Replace(System.Text.Encoding.UTF8.GetString(new byte[] { 0x0A }), "<LINEEND>");
                             tmps = tmps.Replace(System.Text.Encoding.UTF8.GetString(new byte[] { 0x00 }), "<END>");
                             tmp.text = tmps;
-                            final.Add(tmp);
+                            lock (fLock)
+                            {
+                                final.Add(tmp);
+                            }
                         }
                     }
                     else
@@ -111,7 +113,7 @@ namespace AKB148GASBLib
                             write = true;
                         }
                     }
-                }
+                });
                 dlist.Clear();
                 return final;
             }
@@ -121,40 +123,113 @@ namespace AKB148GASBLib
             }
         }
 
-        public static bool injectDialogList(string inFile,List<dialog> dlst)
+        public static List<dialog> getDialogListRAW(string inFile, bool format = false)
+        {
+            List<dialog> dlist = new List<dialog>();
+            using (BinaryReader reader = new BinaryReader(File.Open(inFile, FileMode.Open, FileAccess.Read)))
+            {
+                reader.BaseStream.Position = 52;
+                long tmpl;
+                long tmpeof;
+                if (BitConverter.IsLittleEndian)
+                {
+                    tmpl = reader.ReadInt16();
+                    reader.BaseStream.Position = 60;
+                    tmpeof = reader.ReadInt16();
+                }
+                else
+                {
+                    byte[] tmpb = new byte[4];
+                    tmpb = reader.ReadBytes(2);
+                    Array.Reverse(tmpb);
+                    reader.BaseStream.Position = 60;
+                    byte[] tmpb2 = new byte[4];
+                    tmpb2 = reader.ReadBytes(2);
+                    Array.Reverse(tmpb2);
+                    tmpl = BitConverter.ToInt16(tmpb, 0);
+                    tmpeof = BitConverter.ToInt16(tmpb2, 0);
+                }
+                reader.BaseStream.Position = tmpl;
+                List<byte> mahByteArray = new List<byte>();
+                dialog d = new dialog();
+                d.offset = reader.BaseStream.Position;
+                while (reader.BaseStream.Position != tmpeof)
+                {
+                    mahByteArray.Add(reader.ReadByte());
+                    if (mahByteArray[mahByteArray.Count - 1] == 0x00)
+                    {
+                        d.text = System.Text.Encoding.UTF8.GetString(mahByteArray.ToArray());
+                        d.size = mahByteArray.Count;
+                        dlist.Add(d);
+                        mahByteArray.Clear();
+                        d = new dialog();
+                        d.offset = reader.BaseStream.Position;
+                    }
+                }
+            }
+            if (format)
+            {
+                List<dialog> final = new List<dialog>();
+                Parallel.ForEach(dlist, dl =>
+                {
+                    dialog tmp = new dialog();
+                    tmp.offset = dl.offset;
+                    tmp.size = dl.size;
+                    string tmps = dl.text;
+                    tmps = tmps.Replace(System.Text.Encoding.UTF8.GetString(new byte[] { 0x0A }), "<LINEEND>");
+                    tmps = tmps.Replace(System.Text.Encoding.UTF8.GetString(new byte[] { 0x00 }), "<END>");
+                    tmp.text = tmps;
+                    lock (fLock)
+                    {
+                        final.Add(tmp);
+                    }
+                });
+                dlist.Clear();
+                return final;
+            }
+            else
+            {
+                return dlist;
+            }
+        }
+
+        public static bool injectDialogList(string inFile, List<dialog> dlst)
         {
             try
             {
                 using (BinaryWriter writer = new BinaryWriter(File.Open(inFile, FileMode.Open)))
                 {
-                    foreach (dialog d in dlst)
+                    Parallel.ForEach(dlst, d =>
                     {
-                        writer.BaseStream.Position = d.offset;
+                        var mahByteArray = new List<byte>();
                         if (System.Text.Encoding.UTF8.GetBytes(d.text).Length < d.size)
                         {
                             string s = d.text.Replace("\0", string.Empty);
                             int pad = d.size - System.Text.Encoding.UTF8.GetBytes(d.text).Length;
-                            var mahByteArray = new List<byte>();
                             mahByteArray.AddRange(System.Text.Encoding.UTF8.GetBytes(s));
                             for (int i = 0; i < pad; i++)
                             {
                                 mahByteArray.AddRange(System.Text.Encoding.ASCII.GetBytes(" "));
                             }
                             mahByteArray.Add(0x00);
-                            writer.Write(mahByteArray.ToArray(), 0, d.size);
                         }
                         else if (System.Text.Encoding.UTF8.GetBytes(d.text).Length > d.size)
                         {
-                            var mahByteArray = new List<byte>();
+
                             mahByteArray.AddRange(System.Text.Encoding.UTF8.GetBytes(d.text));
                             mahByteArray.Insert(d.size, 0x00);
-                            writer.Write(mahByteArray.ToArray(), 0, d.size);
+
                         }
                         else
                         {
-                            writer.Write(System.Text.Encoding.UTF8.GetBytes(d.text), 0, d.size);
+                            mahByteArray.AddRange(System.Text.Encoding.UTF8.GetBytes(d.text));
                         }
-                    }
+                        lock (fLock)
+                        {
+                            writer.BaseStream.Position = d.offset;
+                            writer.Write(mahByteArray.ToArray(), 0, d.size);
+                        }
+                    });
                 }
                 return true;
             }

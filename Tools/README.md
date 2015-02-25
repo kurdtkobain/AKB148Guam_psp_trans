@@ -4,8 +4,9 @@ Script Dump/Insert for AKB 1/48: Idol to Guam de Koishitara PSP.
 
 ##Usage:
 
-AKB148GDumpText.exe -d [input asb file] [output txt file]
-AKB148GDumpText.exe -i [input txt file] [output asb file]
+Dump: AKB148GDumpText.exe -d FILE.asb Script.txt
+Dump (Only Event Dialog): AKB148GDumpText.exe -de FILE.asb Script.txt
+Insert: AKB148GDumpText.exe -i Script.txt FILE.asb
 
 Text dumped by tool is as follows:
 
