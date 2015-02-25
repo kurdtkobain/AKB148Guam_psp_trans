@@ -95,6 +95,11 @@ namespace AKB148GDumpText
                 finally
                 {
                     Interlocked.Increment(ref current);
+                    Console.SetCursorPosition(0, 0);
+                    Console.CursorTop = 0;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write("FILE: {0}\r", cmdfileName);
+                    DrawProgressBar(current, total, 36, '■');
                 }
 
             });
