@@ -14,6 +14,9 @@ namespace AKB148GASBLib
     {
         static object fLock = new Object();
 
+
+        // Summary:
+        //     Gets a List<dialog> from asb file.
         public static List<dialog> getDialogList(string inFile, bool format = false, bool eventOnly = false)
         {
             List<dialog> dlist = new List<dialog>();
