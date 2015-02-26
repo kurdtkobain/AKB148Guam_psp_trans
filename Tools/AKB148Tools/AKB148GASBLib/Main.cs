@@ -13,12 +13,14 @@ namespace AKB148GASBLib
     public class ASBTools
     {
         static object fLock = new Object();
-
+        static int threads = 4;
+        static ParallelOptions pOps = new ParallelOptions();
 
         // Summary:
         //     Gets a List<dialog> from asb file.
         public static List<dialog> getDialogList(string inFile, bool format = false, bool eventOnly = false)
         {
+            pOps.MaxDegreeOfParallelism = threads;
             List<dialog> dlist = new List<dialog>();
             using (BinaryReader reader = new BinaryReader(File.Open(inFile, FileMode.Open, FileAccess.Read)))
             {
@@ -56,7 +58,7 @@ namespace AKB148GASBLib
             if (format && !eventOnly)
             {
                 List<dialog> final = new List<dialog>();
-                Parallel.ForEach(dlist, dtpl =>
+                Parallel.ForEach(dlist,pOps, dtpl =>
                 {
                     if (dtpl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x40 })) || dtpl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x00 })) || dtpl.text.StartsWith("//") || dtpl.text.StartsWith("pow( x,") || dtpl.text.StartsWith("env") || dtpl.text.StartsWith("__main") || dtpl.text.StartsWith("main") || dtpl.text.StartsWith("se") || Regex.IsMatch(dtpl.text, "([0-9]{2}_[0-9]{2}_[0-9]{4})"))
                     {
@@ -78,14 +80,14 @@ namespace AKB148GASBLib
                     }
                 });
                 dlist.Clear();
-                return final;
+                return final.OrderBy(o => o.offset).ToList();
             }
             else if (eventOnly)
             {
                 List<dialog> final = new List<dialog>();
                 bool write = false;
                 string filename = "@" + Path.GetFileNameWithoutExtension(inFile);
-                Parallel.ForEach(dlist, dl =>
+                Parallel.ForEach(dlist,pOps, dl =>
                 {
 
                     if (write)
@@ -118,7 +120,7 @@ namespace AKB148GASBLib
                     }
                 });
                 dlist.Clear();
-                return final;
+                return final.OrderBy(o => o.offset).ToList();
             }
             else
             {
@@ -128,6 +130,7 @@ namespace AKB148GASBLib
 
         public static List<dialog> getDialogListRAW(string inFile, bool format = false)
         {
+            pOps.MaxDegreeOfParallelism = threads;
             List<dialog> dlist = new List<dialog>();
             using (BinaryReader reader = new BinaryReader(File.Open(inFile, FileMode.Open, FileAccess.Read)))
             {
@@ -173,7 +176,7 @@ namespace AKB148GASBLib
             if (format)
             {
                 List<dialog> final = new List<dialog>();
-                Parallel.ForEach(dlist, dl =>
+                Parallel.ForEach(dlist,pOps, dl =>
                 {
                     dialog tmp = new dialog();
                     tmp.offset = dl.offset;
@@ -188,7 +191,7 @@ namespace AKB148GASBLib
                     }
                 });
                 dlist.Clear();
-                return final;
+                return final.OrderBy(o => o.offset).ToList();
             }
             else
             {
@@ -198,11 +201,12 @@ namespace AKB148GASBLib
 
         public static bool injectDialogList(string inFile, List<dialog> dlst)
         {
+            pOps.MaxDegreeOfParallelism = threads;
             try
             {
                 using (BinaryWriter writer = new BinaryWriter(File.Open(inFile, FileMode.Open)))
                 {
-                    Parallel.ForEach(dlst, d =>
+                    Parallel.ForEach(dlst,pOps, d =>
                     {
                         var mahByteArray = new List<byte>();
                         if (System.Text.Encoding.UTF8.GetBytes(d.text).Length < d.size)

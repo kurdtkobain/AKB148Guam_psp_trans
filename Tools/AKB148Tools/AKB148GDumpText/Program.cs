@@ -130,12 +130,10 @@ namespace AKB148GDumpText
                             dlist = ASBTools.getDialogList(asbfileName, true);
                         }
                     }
-                    List<dialog> objListOrder = dlist.OrderBy(o => o.offset).ToList();
-                    dlist.Clear();
                     string outfile = outFolder + "\\" + Path.GetFileNameWithoutExtension(asbfileName) + ".txt";
                     using (BinaryWriter writer = new BinaryWriter(File.Open(outfile, FileMode.Create)))
                     {
-                        foreach (dialog dl in objListOrder)
+                        foreach (dialog dl in dlist)
                         {
                             writer.Write(System.Text.Encoding.UTF8.GetBytes(dl.offset.ToString()));
                             writer.Write(System.Text.Encoding.UTF8.GetBytes(";"));
@@ -179,11 +177,9 @@ namespace AKB148GDumpText
                     dlist = ASBTools.getDialogList(inFile, true);
                 }
             }
-            List<dialog> objListOrder = dlist.OrderBy(o => o.offset).ToList();
-            dlist.Clear();
             using (BinaryWriter writer = new BinaryWriter(File.Open(outFile, FileMode.Create)))
             {
-                foreach (dialog dl in objListOrder)
+                foreach (dialog dl in dlist)
                 {
                     writer.Write(System.Text.Encoding.UTF8.GetBytes(dl.offset.ToString()));
                     writer.Write(System.Text.Encoding.UTF8.GetBytes(";"));
