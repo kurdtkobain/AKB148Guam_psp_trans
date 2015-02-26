@@ -18,14 +18,13 @@
 *.aps
 *.exp
 *.qdact
+bin
+obj
 Debug
 Release
 
 # For Mac
 .DS_Store
 
-bin
-gen
-libs
-obj
+
 
