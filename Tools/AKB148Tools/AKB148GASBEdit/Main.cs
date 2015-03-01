@@ -82,14 +82,16 @@ namespace AKB148GASBEdit
             else
             {
                 MessageBox.Show("Can't insert text that is larger than original size.", "ERROR", MessageBoxButtons.OK);
-
             }
 
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
+            if (currentFile != null)
+            {
                 MessageBox.Show("For this to take effect you must reload file.", "Attention!", MessageBoxButtons.OK);
+            }
         }
 
 
@@ -107,10 +109,8 @@ namespace AKB148GASBEdit
             {
                 currentFile = openFileDialog1.FileName;
                 List<dialog> dlist = ASBTools.getDialogList(openFileDialog1.FileName, true, checkBox1.Checked);
-                List<dialog> objListOrder = dlist.OrderBy(o => o.offset).ToList();
-                dlist.Clear();
                 dataGridView1.ReadOnly = true;
-                dataGridView1.DataSource = objListOrder;
+                dataGridView1.DataSource = dlist;
                 dataGridView1.AutoResizeColumns();
             }
         }
