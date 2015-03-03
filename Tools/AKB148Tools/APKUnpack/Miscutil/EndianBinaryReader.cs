@@ -589,7 +589,13 @@ namespace MiscUtil.IO
         /// </summary>
         public void Dispose()
         {
-            if (!disposed)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
             {
                 disposed = true;
                 ((IDisposable)stream).Dispose();

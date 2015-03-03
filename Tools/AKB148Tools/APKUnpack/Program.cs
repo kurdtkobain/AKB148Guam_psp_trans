@@ -107,7 +107,8 @@ namespace APKUnpack
                         //FOLDERS fldrs = new FOLDERS(pktoc.folders);
                         for (int k = 0; k < pktoc.folders; k++)
                         {
-                            /*fldrs.dummystring.Add(reader.ReadBytes(pktoc.entrySize));
+                            /*
+                            fldrs.dummystring.Add(reader.ReadBytes(pktoc.entrySize));
                             fldrs.nameIdx.Add(fldrs.dummystring[k].ElementAt(4));
                             fldrs.fileNum.Add(fldrs.dummystring[k].ElementAt(16));
                             fldrs.subFiles.Add(fldrs.dummystring[k].ElementAt(20));
