@@ -11,18 +11,17 @@ namespace CMPTSTR
         public long offset;
         public int size;
     }
-    class Program
+
+    internal class Program
     {
+        private static object fLock = new Object();
 
-        static object fLock = new Object();
-
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             tst(args[0]);
-
         }
 
-        static void tst(string asbFolder)
+        private static void tst(string asbFolder)
         {
             FileStream filestream = new FileStream("out.txt", FileMode.Create);
             var streamwriter = new StreamWriter(filestream);
@@ -64,10 +63,9 @@ namespace CMPTSTR
                     {
                         asblist.Add(asbtmp);
                     }
-
                 }
             });
-            Parallel.ForEach(asblist,cfn=>
+            Parallel.ForEach(asblist, cfn =>
             {
                 foreach (chechfn asbcfn in asblist)
                 {

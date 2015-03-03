@@ -12,9 +12,9 @@ namespace AKB148GASBLib
 {
     public class ASBTools
     {
-        static object fLock = new Object();
-        static int threads = 4;
-        static ParallelOptions pOps = new ParallelOptions();
+        private static object fLock = new Object();
+        private static int threads = 4;
+        private static ParallelOptions pOps = new ParallelOptions();
 
         // Summary:
         //     Gets a List<dialog> from asb file.
@@ -58,11 +58,10 @@ namespace AKB148GASBLib
             if (format && !eventOnly)
             {
                 List<dialog> final = new List<dialog>();
-                Parallel.ForEach(dlist,pOps, dtpl =>
+                Parallel.ForEach(dlist, pOps, dtpl =>
                 {
                     if (dtpl.text.StartsWith(Encoding.UTF8.GetString(new byte[] { 0x40 })) || dtpl.text.StartsWith(Encoding.UTF8.GetString(new byte[] { 0x00 })) || dtpl.text.StartsWith("//") || dtpl.text.StartsWith("pow( x,") || dtpl.text.StartsWith("env") || dtpl.text.StartsWith("__main") || dtpl.text.StartsWith("main") || dtpl.text.StartsWith("se") || Regex.IsMatch(dtpl.text, "([0-9]{2}_[0-9]{2}_[0-9]{4})"))
                     {
-
                     }
                     else
                     {
@@ -87,14 +86,12 @@ namespace AKB148GASBLib
                 List<dialog> final = new List<dialog>();
                 bool write = false;
                 string filename = "@" + Path.GetFileNameWithoutExtension(inFile);
-                Parallel.ForEach(dlist,pOps, dl =>
+                Parallel.ForEach(dlist, pOps, dl =>
                 {
-
                     if (write)
                     {
                         if (dl.text.StartsWith(Encoding.UTF8.GetString(new byte[] { 0x40 })) || dl.text.StartsWith(Encoding.UTF8.GetString(new byte[] { 0x00 })) || dl.text.StartsWith("//") || dl.text.StartsWith("env") || dl.text.StartsWith("pow( x,") || dl.text.StartsWith("__main") || dl.text.StartsWith("main") || dl.text.StartsWith("se") || Regex.IsMatch(dl.text, "([0-9]{2}_[0-9]{2}_[0-9]{4})"))
                         {
-
                         }
                         else
                         {
@@ -176,7 +173,7 @@ namespace AKB148GASBLib
             if (format)
             {
                 List<dialog> final = new List<dialog>();
-                Parallel.ForEach(dlist,pOps, dl =>
+                Parallel.ForEach(dlist, pOps, dl =>
                 {
                     dialog tmp = new dialog();
                     tmp.offset = dl.offset;
@@ -206,7 +203,7 @@ namespace AKB148GASBLib
             {
                 using (BinaryWriter writer = new BinaryWriter(File.Open(inFile, FileMode.Open)))
                 {
-                    Parallel.ForEach(dlst,pOps, d =>
+                    Parallel.ForEach(dlst, pOps, d =>
                     {
                         var mahByteArray = new List<byte>();
                         if (Encoding.UTF8.GetBytes(d.text).Length < d.size)
@@ -222,10 +219,8 @@ namespace AKB148GASBLib
                         }
                         else if (Encoding.UTF8.GetBytes(d.text).Length > d.size)
                         {
-
                             mahByteArray.AddRange(Encoding.UTF8.GetBytes(d.text));
                             mahByteArray.Insert(d.size, 0x00);
-
                         }
                         else
                         {
@@ -251,7 +246,9 @@ namespace AKB148GASBLib
     public class dialog : INotifyPropertyChanged
     {
         public long offset { get; set; }
+
         public int size { get; set; }
+
         public string text { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;

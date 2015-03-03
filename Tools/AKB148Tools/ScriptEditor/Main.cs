@@ -10,23 +10,8 @@ namespace ScriptEditor
 {
     public partial class Main : Form
     {
-        int selectedRowIndex;
-        class dialog : INotifyPropertyChanged
-        {
-            public long offset { get; set; }
-            public int size { get; set; }
-            public string text { get; set; }
+        private int selectedRowIndex;
 
-            public event PropertyChangedEventHandler PropertyChanged;
-
-            private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-            {
-                if (PropertyChanged != null)
-                {
-                    PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-                }
-            }
-        }
         public Main()
         {
             InitializeComponent();
@@ -61,11 +46,8 @@ namespace ScriptEditor
                         writer.Write(Encoding.UTF8.GetBytes(d.text.ToString()));
                         writer.Write(Encoding.UTF8.GetBytes(Environment.NewLine));
                     }
-
                 }
-
             }
-
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -104,6 +86,13 @@ namespace ScriptEditor
             }
         }
 
+        private void button3_Click(object sender, EventArgs e)
+        {
+            dialog obj = (dialog)dataGridView1.Rows[selectedRowIndex].DataBoundItem;
+            obj.text = textBox1.Text;
+            dataGridView1.Refresh();
+        }
+
         private void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             selectedRowIndex = e.RowIndex;
@@ -120,12 +109,23 @@ namespace ScriptEditor
             label1.Text = "Characters left: " + ((textBox1.MaxLength - 200) - Encoding.UTF8.GetBytes(tmps).Length);
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private class dialog : INotifyPropertyChanged
         {
-            dialog obj = (dialog)dataGridView1.Rows[selectedRowIndex].DataBoundItem;
-            obj.text = textBox1.Text;
-            dataGridView1.Refresh();
+            public event PropertyChangedEventHandler PropertyChanged;
 
+            public long offset { get; set; }
+
+            public int size { get; set; }
+
+            public string text { get; set; }
+
+            private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+            {
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+                }
+            }
         }
     }
 }

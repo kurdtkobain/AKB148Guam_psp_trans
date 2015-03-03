@@ -1,25 +1,25 @@
-﻿using System;
+﻿using MiscUtil.Conversion;
+using MiscUtil.IO;
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
 using System.Windows.Forms;
-using MiscUtil.Conversion;
-using MiscUtil.IO;
 
 namespace APKUnpack
 {
-    class Program
+    internal class Program
     {
-        class GENESTRT
+        private class GENESTRT
         {
             public long offset;
             public long stringcnt;
             public long[] nameofflist;
             public long names_off;
             public string[] stringlist;
-
         }
-        class PACKHEDR
+
+        private class PACKHEDR
         {
             public long headerSize;
             public long dummy;
@@ -28,7 +28,8 @@ namespace APKUnpack
             public long dummy2;
             public string dummystring;
         }
-        class PACKTOC
+
+        private class PACKTOC
         {
             public long size;
             public long offset;
@@ -37,7 +38,8 @@ namespace APKUnpack
             public int folders;
             public long zero;
         }
-        class PACKFSLS
+
+        private class PACKFSLS
         {
             public long headerSize;
             public long headerOffset;
@@ -46,6 +48,7 @@ namespace APKUnpack
             public long dummy2;
             public long zero;
         }
+
         /*class FOLDERS
         {
             public List<byte[]> dummystring = new List<byte[]>();
@@ -58,8 +61,9 @@ namespace APKUnpack
                 foldernames = new string[num];
             }
         }*/
+
         [STAThread]
-        static int Main(string[] args)
+        private static int Main(string[] args)
         {
             OpenFileDialog fd = new OpenFileDialog();
             fd.Filter = "AKB 1/48 Guam apk files|*.apk";
@@ -112,7 +116,6 @@ namespace APKUnpack
                             fldrs.foldernames[k] = gene1.stringlist[fldrs.nameIdx[k]];
                             */
                             reader.ReadBytes(pktoc.entrySize);
-
                         }
                         for (int l = pktoc.folders; l < pktoc.files; l++)
                         {
@@ -179,7 +182,6 @@ namespace APKUnpack
                             long tmppos = reader.BaseStream.Position;
                             extractArchives(reader, archiveoffset, aname, fbd.SelectedPath);
                             reader.BaseStream.Position = tmppos;
-
                         }
                     }
                     filestream.Close();
@@ -188,7 +190,7 @@ namespace APKUnpack
             return 1;
         }
 
-        static void extractArchives(EndianBinaryReader bread, long offset, string archname, string path)
+        private static void extractArchives(EndianBinaryReader bread, long offset, string archname, string path)
         {
             bread.BaseStream.Position = offset;
             bread.ReadBytes(8);
@@ -245,7 +247,7 @@ namespace APKUnpack
             }
         }
 
-        static GENESTRT GetGENESTRT(EndianBinaryReader br, long headerOffset, long headerSize)
+        private static GENESTRT GetGENESTRT(EndianBinaryReader br, long headerOffset, long headerSize)
         {
             GENESTRT genetmp = new GENESTRT();
             long tmp = br.BaseStream.Position;
@@ -255,7 +257,6 @@ namespace APKUnpack
             {
                 if (br.ReadByte() == '\0')
                 {
-
                 }
                 else
                 {

@@ -1,22 +1,22 @@
-﻿using System;
+﻿using AKB148GASBLib;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using AKB148GASBLib;
 
 namespace AKB148GDumpText
 {
-    class Program
+    internal class Program
     {
-        static object fLock = new object();
-        static void Main(string[] args)
+        private static object fLock = new object();
+
+        private static void Main(string[] args)
         {
             switch (args[0])
             {
-
                 case "-d":
                     Dump(args[1], args[2]);
                     break;
@@ -100,7 +100,6 @@ namespace AKB148GDumpText
                     Console.Write("FILE: {0}\r", cmdfileName);
                     DrawProgressBar(current, total, 36, '■');
                 }
-
             });
         }
 
@@ -141,7 +140,6 @@ namespace AKB148GDumpText
                             writer.Write(Encoding.UTF8.GetBytes(dl.text));
                             writer.Write(Encoding.UTF8.GetBytes(Environment.NewLine));
                         }
-
                     }
                 }
                 finally
@@ -158,7 +156,8 @@ namespace AKB148GDumpText
                 }
             });
         }
-        static void Dump(string inFile, string outFile, bool eventOnly = false, bool raw = false)
+
+        private static void Dump(string inFile, string outFile, bool eventOnly = false, bool raw = false)
         {
             List<dialog> dlist;
             if (eventOnly)
@@ -187,11 +186,10 @@ namespace AKB148GDumpText
                     writer.Write(Encoding.UTF8.GetBytes(dl.text));
                     writer.Write(Encoding.UTF8.GetBytes(Environment.NewLine));
                 }
-
             }
         }
 
-        static void Insert(string cmdFile, string inFile)
+        private static void Insert(string cmdFile, string inFile)
         {
             List<dialog> dList = new List<dialog>();
             using (StreamReader file = new StreamReader(cmdFile))
@@ -240,6 +238,5 @@ namespace AKB148GDumpText
             Console.Write(" {0}%", (perc * 100).ToString("N2"));
             Console.CursorLeft = left;
         }
-
     }
 }
