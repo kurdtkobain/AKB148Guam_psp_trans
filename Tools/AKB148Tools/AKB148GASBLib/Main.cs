@@ -46,7 +46,7 @@ namespace AKB148GASBLib
                     mahByteArray.Add(reader.ReadByte());
                     if (mahByteArray[mahByteArray.Count - 1] == 0x00)
                     {
-                        d.text = System.Text.Encoding.UTF8.GetString(mahByteArray.ToArray());
+                        d.text = Encoding.UTF8.GetString(mahByteArray.ToArray());
                         d.size = mahByteArray.Count;
                         dlist.Add(d);
                         mahByteArray.Clear();
@@ -60,7 +60,7 @@ namespace AKB148GASBLib
                 List<dialog> final = new List<dialog>();
                 Parallel.ForEach(dlist,pOps, dtpl =>
                 {
-                    if (dtpl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x40 })) || dtpl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x00 })) || dtpl.text.StartsWith("//") || dtpl.text.StartsWith("pow( x,") || dtpl.text.StartsWith("env") || dtpl.text.StartsWith("__main") || dtpl.text.StartsWith("main") || dtpl.text.StartsWith("se") || Regex.IsMatch(dtpl.text, "([0-9]{2}_[0-9]{2}_[0-9]{4})"))
+                    if (dtpl.text.StartsWith(Encoding.UTF8.GetString(new byte[] { 0x40 })) || dtpl.text.StartsWith(Encoding.UTF8.GetString(new byte[] { 0x00 })) || dtpl.text.StartsWith("//") || dtpl.text.StartsWith("pow( x,") || dtpl.text.StartsWith("env") || dtpl.text.StartsWith("__main") || dtpl.text.StartsWith("main") || dtpl.text.StartsWith("se") || Regex.IsMatch(dtpl.text, "([0-9]{2}_[0-9]{2}_[0-9]{4})"))
                     {
 
                     }
@@ -70,8 +70,8 @@ namespace AKB148GASBLib
                         tmp.offset = dtpl.offset;
                         tmp.size = dtpl.size;
                         string tmps = dtpl.text;
-                        tmps = tmps.Replace(System.Text.Encoding.UTF8.GetString(new byte[] { 0x0A }), "<LINEEND>");
-                        tmps = tmps.Replace(System.Text.Encoding.UTF8.GetString(new byte[] { 0x00 }), "<END>");
+                        tmps = tmps.Replace(Encoding.UTF8.GetString(new byte[] { 0x0A }), "<LINEEND>");
+                        tmps = tmps.Replace(Encoding.UTF8.GetString(new byte[] { 0x00 }), "<END>");
                         tmp.text = tmps;
                         lock (fLock)
                         {
@@ -92,7 +92,7 @@ namespace AKB148GASBLib
 
                     if (write)
                     {
-                        if (dl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x40 })) || dl.text.StartsWith(System.Text.Encoding.UTF8.GetString(new byte[] { 0x00 })) || dl.text.StartsWith("//") || dl.text.StartsWith("env") || dl.text.StartsWith("pow( x,") || dl.text.StartsWith("__main") || dl.text.StartsWith("main") || dl.text.StartsWith("se") || Regex.IsMatch(dl.text, "([0-9]{2}_[0-9]{2}_[0-9]{4})"))
+                        if (dl.text.StartsWith(Encoding.UTF8.GetString(new byte[] { 0x40 })) || dl.text.StartsWith(Encoding.UTF8.GetString(new byte[] { 0x00 })) || dl.text.StartsWith("//") || dl.text.StartsWith("env") || dl.text.StartsWith("pow( x,") || dl.text.StartsWith("__main") || dl.text.StartsWith("main") || dl.text.StartsWith("se") || Regex.IsMatch(dl.text, "([0-9]{2}_[0-9]{2}_[0-9]{4})"))
                         {
 
                         }
@@ -102,8 +102,8 @@ namespace AKB148GASBLib
                             tmp.offset = dl.offset;
                             tmp.size = dl.size;
                             string tmps = dl.text;
-                            tmps = tmps.Replace(System.Text.Encoding.UTF8.GetString(new byte[] { 0x0A }), "<LINEEND>");
-                            tmps = tmps.Replace(System.Text.Encoding.UTF8.GetString(new byte[] { 0x00 }), "<END>");
+                            tmps = tmps.Replace(Encoding.UTF8.GetString(new byte[] { 0x0A }), "<LINEEND>");
+                            tmps = tmps.Replace(Encoding.UTF8.GetString(new byte[] { 0x00 }), "<END>");
                             tmp.text = tmps;
                             lock (fLock)
                             {
@@ -164,7 +164,7 @@ namespace AKB148GASBLib
                     mahByteArray.Add(reader.ReadByte());
                     if (mahByteArray[mahByteArray.Count - 1] == 0x00)
                     {
-                        d.text = System.Text.Encoding.UTF8.GetString(mahByteArray.ToArray());
+                        d.text = Encoding.UTF8.GetString(mahByteArray.ToArray());
                         d.size = mahByteArray.Count;
                         dlist.Add(d);
                         mahByteArray.Clear();
@@ -182,8 +182,8 @@ namespace AKB148GASBLib
                     tmp.offset = dl.offset;
                     tmp.size = dl.size;
                     string tmps = dl.text;
-                    tmps = tmps.Replace(System.Text.Encoding.UTF8.GetString(new byte[] { 0x0A }), "<LINEEND>");
-                    tmps = tmps.Replace(System.Text.Encoding.UTF8.GetString(new byte[] { 0x00 }), "<END>");
+                    tmps = tmps.Replace(Encoding.UTF8.GetString(new byte[] { 0x0A }), "<LINEEND>");
+                    tmps = tmps.Replace(Encoding.UTF8.GetString(new byte[] { 0x00 }), "<END>");
                     tmp.text = tmps;
                     lock (fLock)
                     {
@@ -209,27 +209,27 @@ namespace AKB148GASBLib
                     Parallel.ForEach(dlst,pOps, d =>
                     {
                         var mahByteArray = new List<byte>();
-                        if (System.Text.Encoding.UTF8.GetBytes(d.text).Length < d.size)
+                        if (Encoding.UTF8.GetBytes(d.text).Length < d.size)
                         {
                             string s = d.text.Replace("\0", string.Empty);
-                            int pad = d.size - System.Text.Encoding.UTF8.GetBytes(d.text).Length;
-                            mahByteArray.AddRange(System.Text.Encoding.UTF8.GetBytes(s));
+                            int pad = d.size - Encoding.UTF8.GetBytes(d.text).Length;
+                            mahByteArray.AddRange(Encoding.UTF8.GetBytes(s));
                             for (int i = 0; i < pad; i++)
                             {
-                                mahByteArray.AddRange(System.Text.Encoding.ASCII.GetBytes(" "));
+                                mahByteArray.AddRange(Encoding.ASCII.GetBytes(" "));
                             }
                             mahByteArray.Add(0x00);
                         }
-                        else if (System.Text.Encoding.UTF8.GetBytes(d.text).Length > d.size)
+                        else if (Encoding.UTF8.GetBytes(d.text).Length > d.size)
                         {
 
-                            mahByteArray.AddRange(System.Text.Encoding.UTF8.GetBytes(d.text));
+                            mahByteArray.AddRange(Encoding.UTF8.GetBytes(d.text));
                             mahByteArray.Insert(d.size, 0x00);
 
                         }
                         else
                         {
-                            mahByteArray.AddRange(System.Text.Encoding.UTF8.GetBytes(d.text));
+                            mahByteArray.AddRange(Encoding.UTF8.GetBytes(d.text));
                         }
                         lock (fLock)
                         {

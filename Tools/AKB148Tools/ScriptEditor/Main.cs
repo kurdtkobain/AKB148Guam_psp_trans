@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ScriptEditor
@@ -58,12 +54,12 @@ namespace ScriptEditor
                 {
                     foreach (dialog d in items)
                     {
-                        writer.Write(System.Text.Encoding.UTF8.GetBytes(d.offset.ToString()));
-                        writer.Write(System.Text.Encoding.UTF8.GetBytes(";"));
-                        writer.Write(System.Text.Encoding.UTF8.GetBytes(d.size.ToString()));
-                        writer.Write(System.Text.Encoding.UTF8.GetBytes(";"));
-                        writer.Write(System.Text.Encoding.UTF8.GetBytes(d.text.ToString()));
-                        writer.Write(System.Text.Encoding.UTF8.GetBytes(Environment.NewLine));
+                        writer.Write(Encoding.UTF8.GetBytes(d.offset.ToString()));
+                        writer.Write(Encoding.UTF8.GetBytes(";"));
+                        writer.Write(Encoding.UTF8.GetBytes(d.size.ToString()));
+                        writer.Write(Encoding.UTF8.GetBytes(";"));
+                        writer.Write(Encoding.UTF8.GetBytes(d.text.ToString()));
+                        writer.Write(Encoding.UTF8.GetBytes(Environment.NewLine));
                     }
 
                 }
@@ -87,9 +83,9 @@ namespace ScriptEditor
                 textBox1.Text = "";
                 label1.Text = "Characters left: 0";
                 selectedRowIndex = 0;
-                System.IO.Stream fileStream = openFileDialog1.OpenFile();
+                Stream fileStream = openFileDialog1.OpenFile();
                 List<dialog> dList = new List<dialog>();
-                System.IO.StreamReader file = new System.IO.StreamReader(fileStream);
+                StreamReader file = new StreamReader(fileStream);
                 while (!file.EndOfStream)
                 {
                     dialog d1 = new dialog();
@@ -119,9 +115,9 @@ namespace ScriptEditor
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
             string tmps = textBox1.Text;
-            tmps = tmps.Replace("<LINEEND>", System.Text.Encoding.UTF8.GetString(new byte[] { 0x0A }));
-            tmps = tmps.Replace("<END>", System.Text.Encoding.UTF8.GetString(new byte[] { 0x00 }));
-            label1.Text = "Characters left: " + ((textBox1.MaxLength - 200) - System.Text.Encoding.UTF8.GetBytes(tmps).Length);
+            tmps = tmps.Replace("<LINEEND>", Encoding.UTF8.GetString(new byte[] { 0x0A }));
+            tmps = tmps.Replace("<END>", Encoding.UTF8.GetString(new byte[] { 0x00 }));
+            label1.Text = "Characters left: " + ((textBox1.MaxLength - 200) - Encoding.UTF8.GetBytes(tmps).Length);
         }
 
         private void button3_Click(object sender, EventArgs e)

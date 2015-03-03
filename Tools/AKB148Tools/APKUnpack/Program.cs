@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using MiscUtil.IO;
 using MiscUtil.Conversion;
+using MiscUtil.IO;
 
 namespace APKUnpack
 {
@@ -91,7 +88,7 @@ namespace APKUnpack
                         pkhdr.zero = reader.ReadInt32();
                         pkhdr.dummySize = reader.ReadInt32();
                         pkhdr.dummy2 = reader.ReadInt32();
-                        pkhdr.dummystring = System.Text.Encoding.ASCII.GetString(reader.ReadBytes(16));
+                        pkhdr.dummystring = Encoding.ASCII.GetString(reader.ReadBytes(16));
                         if (Encoding.ASCII.GetString(reader.ReadBytes(8)) != "PACKTOC ")
                         {
                             return -1;
