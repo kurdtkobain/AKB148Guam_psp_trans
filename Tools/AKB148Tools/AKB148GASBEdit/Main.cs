@@ -1,8 +1,8 @@
-﻿using System;
+﻿using AKB148GASBLib;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
-using AKB148GASBLib;
 
 namespace AKB148GASBEdit
 {
@@ -26,11 +26,11 @@ namespace AKB148GASBEdit
                 foreach (DataGridViewRow dr in dataGridView1.Rows)
                 {
                     var item = new dialog();
-                    item.offset = (long) dr.Cells["offset"].Value;
-                    item.size = (int) dr.Cells["size"].Value;
+                    item.offset = (long)dr.Cells["offset"].Value;
+                    item.size = (int)dr.Cells["size"].Value;
                     item.text = dr.Cells["text"].Value.ToString();
-                    item.text = item.text.Replace("<LINEEND>", Encoding.UTF8.GetString(new byte[] {0x0A}));
-                    item.text = item.text.Replace("<END>", Encoding.UTF8.GetString(new byte[] {0x00}));
+                    item.text = item.text.Replace("<LINEEND>", Encoding.UTF8.GetString(new byte[] { 0x0A }));
+                    item.text = item.text.Replace("<END>", Encoding.UTF8.GetString(new byte[] { 0x00 }));
                     dlist.Add(item);
                 }
 
@@ -51,26 +51,26 @@ namespace AKB148GASBEdit
         {
             selectedRowIndex = e.RowIndex;
             textBox1.Text = dataGridView1.Rows[e.RowIndex].Cells["text"].Value.ToString();
-            textBox1.MaxLength = (int) dataGridView1.Rows[e.RowIndex].Cells["size"].Value + 200;
+            textBox1.MaxLength = (int)dataGridView1.Rows[e.RowIndex].Cells["size"].Value + 200;
             label1.Text = "Characters left: 0";
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
             var tmps = textBox1.Text;
-            tmps = tmps.Replace("<LINEEND>", Encoding.UTF8.GetString(new byte[] {0x0A}));
-            tmps = tmps.Replace("<END>", Encoding.UTF8.GetString(new byte[] {0x00}));
+            tmps = tmps.Replace("<LINEEND>", Encoding.UTF8.GetString(new byte[] { 0x0A }));
+            tmps = tmps.Replace("<END>", Encoding.UTF8.GetString(new byte[] { 0x00 }));
             label1.Text = "Characters left: " + ((textBox1.MaxLength - 200) - Encoding.UTF8.GetBytes(tmps).Length);
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
             var tmps = textBox1.Text;
-            tmps = tmps.Replace("<LINEEND>", Encoding.UTF8.GetString(new byte[] {0x0A}));
-            tmps = tmps.Replace("<END>", Encoding.UTF8.GetString(new byte[] {0x00}));
+            tmps = tmps.Replace("<LINEEND>", Encoding.UTF8.GetString(new byte[] { 0x0A }));
+            tmps = tmps.Replace("<END>", Encoding.UTF8.GetString(new byte[] { 0x00 }));
             if (((textBox1.MaxLength - 200) - Encoding.UTF8.GetBytes(tmps).Length) >= 0)
             {
-                var obj = (dialog) dataGridView1.Rows[selectedRowIndex].DataBoundItem;
+                var obj = (dialog)dataGridView1.Rows[selectedRowIndex].DataBoundItem;
                 obj.text = textBox1.Text;
                 dataGridView1.Refresh();
             }

@@ -1,7 +1,7 @@
-﻿using System;
+﻿using MiscUtil.Conversion;
+using System;
 using System.IO;
 using System.Text;
-using MiscUtil.Conversion;
 
 namespace MiscUtil.IO
 {
@@ -13,29 +13,36 @@ namespace MiscUtil.IO
     public class EndianBinaryReader : IDisposable
     {
         #region Fields not directly related to properties
+
         /// <summary>
         /// Whether or not this reader has been disposed yet.
         /// </summary>
-        bool disposed = false;
+        private bool disposed = false;
+
         /// <summary>
         /// Decoder to use for string conversions.
         /// </summary>
-        Decoder decoder;
+        private Decoder decoder;
+
         /// <summary>
         /// Buffer used for temporary storage before conversion into primitives
         /// </summary>
-        byte[] buffer = new byte[16];
+        private byte[] buffer = new byte[16];
+
         /// <summary>
         /// Buffer used for temporary storage when reading a single character
         /// </summary>
-        char[] charBuffer = new char[1];
+        private char[] charBuffer = new char[1];
+
         /// <summary>
         /// Minimum number of bytes used to encode a character
         /// </summary>
-        int minBytesPerChar;
-        #endregion
+        private int minBytesPerChar;
+
+        #endregion Fields not directly related to properties
 
         #region Constructors
+
         /// <summary>
         /// Equivalent of System.IO.BinaryWriter, but with either endianness, depending on
         /// the EndianBitConverter it is constructed with.
@@ -84,10 +91,13 @@ namespace MiscUtil.IO
                 minBytesPerChar = 2;
             }
         }
-        #endregion
+
+        #endregion Constructors
 
         #region Properties
-        EndianBitConverter bitConverter;
+
+        private EndianBitConverter bitConverter;
+
         /// <summary>
         /// The bit converter used to read values from the stream
         /// </summary>
@@ -96,7 +106,8 @@ namespace MiscUtil.IO
             get { return bitConverter; }
         }
 
-        Encoding encoding;
+        private Encoding encoding;
+
         /// <summary>
         /// The encoding used to read strings
         /// </summary>
@@ -105,7 +116,8 @@ namespace MiscUtil.IO
             get { return encoding; }
         }
 
-        Stream stream;
+        private Stream stream;
+
         /// <summary>
         /// Gets the underlying stream of the EndianBinaryReader.
         /// </summary>
@@ -113,9 +125,11 @@ namespace MiscUtil.IO
         {
             get { return stream; }
         }
-        #endregion
+
+        #endregion Properties
 
         #region Public methods
+
         /// <summary>
         /// Closes the reader, including the underlying stream..
         /// </summary>
@@ -507,7 +521,7 @@ namespace MiscUtil.IO
 
         /// <summary>
         /// Reads a length-prefixed string from the stream, using the encoding for this reader.
-        /// A 7-bit encoded integer is first read, which specifies the number of bytes 
+        /// A 7-bit encoded integer is first read, which specifies the number of bytes
         /// to read from the stream. These bytes are then converted into a string with
         /// the encoding for this reader.
         /// </summary>
@@ -521,13 +535,14 @@ namespace MiscUtil.IO
             return encoding.GetString(data, 0, data.Length);
         }
 
-        #endregion
+        #endregion Public methods
 
         #region Private methods
+
         /// <summary>
         /// Checks whether or not the reader has been disposed, throwing an exception if so.
         /// </summary>
-        void CheckDisposed()
+        private void CheckDisposed()
         {
             if (disposed)
             {
@@ -541,7 +556,7 @@ namespace MiscUtil.IO
         /// </summary>
         /// <param name="data">Buffer to read into</param>
         /// <param name="size">Number of bytes to read</param>
-        void ReadInternal(byte[] data, int size)
+        private void ReadInternal(byte[] data, int size)
         {
             CheckDisposed();
             int index = 0;
@@ -566,7 +581,7 @@ namespace MiscUtil.IO
         /// <param name="data">Buffer to read into</param>
         /// <param name="size">Number of bytes to read</param>
         /// <returns>Number of bytes actually read</returns>
-        int TryReadInternal(byte[] data, int size)
+        private int TryReadInternal(byte[] data, int size)
         {
             CheckDisposed();
             int index = 0;
@@ -581,9 +596,11 @@ namespace MiscUtil.IO
             }
             return index;
         }
-        #endregion
+
+        #endregion Private methods
 
         #region IDisposable Members
+
         /// <summary>
         /// Disposes of the underlying stream.
         /// </summary>
@@ -601,6 +618,7 @@ namespace MiscUtil.IO
                 ((IDisposable)stream).Dispose();
             }
         }
-        #endregion
+
+        #endregion IDisposable Members
     }
 }
