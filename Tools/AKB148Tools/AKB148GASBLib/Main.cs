@@ -7,6 +7,8 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using MiscUtil.IO;
+using MiscUtil.Conversion;
 
 namespace AKB148GASBLib
 {
@@ -22,38 +24,21 @@ namespace AKB148GASBLib
         {
             pOps.MaxDegreeOfParallelism = threads;
             List<dialog> dlist = new List<dialog>();
-            using (BinaryReader reader = new BinaryReader(File.Open(inFile, FileMode.Open, FileAccess.Read)))
+            EndianBinaryReader reader = new EndianBinaryReader(EndianBitConverter.Little, File.Open(inFile, FileMode.Open, FileAccess.Read));
+            reader.BaseStream.Position = 52;
+            int script_offset = reader.ReadInt32();
+            int script_size = reader.ReadInt32();
+            //int script_end = reader.ReadInt32();
+            reader.BaseStream.Position = script_offset;
+            MemoryStream scriptStream = new MemoryStream(reader.ReadBytes(script_size));
+            reader.Close();
+            while (scriptStream.Position != scriptStream.Length)
             {
-                reader.BaseStream.Position = 52;
-                long tmpl;
-                if (BitConverter.IsLittleEndian)
-                {
-                    tmpl = reader.ReadInt16();
-                }
-                else
-                {
-                    byte[] tmpb = new byte[4];
-                    tmpb = reader.ReadBytes(2);
-                    Array.Reverse(tmpb);
-                    tmpl = BitConverter.ToInt16(tmpb, 0);
-                }
-                reader.BaseStream.Position = tmpl;
-                List<byte> mahByteArray = new List<byte>();
                 dialog d = new dialog();
-                d.offset = reader.BaseStream.Position;
-                while (reader.PeekChar() != -1)
-                {
-                    mahByteArray.Add(reader.ReadByte());
-                    if (mahByteArray[mahByteArray.Count - 1] == 0x00)
-                    {
-                        d.text = Encoding.UTF8.GetString(mahByteArray.ToArray());
-                        d.size = mahByteArray.Count;
-                        dlist.Add(d);
-                        mahByteArray.Clear();
-                        d = new dialog();
-                        d.offset = reader.BaseStream.Position;
-                    }
-                }
+                d.offset = scriptStream.Position + script_offset;
+                d.text = ReadStringZ(scriptStream);
+                d.size = Encoding.UTF8.GetBytes(d.text).Length;
+                dlist.Add(d);
             }
             if (format && !eventOnly)
             {
@@ -129,46 +114,21 @@ namespace AKB148GASBLib
         {
             pOps.MaxDegreeOfParallelism = threads;
             List<dialog> dlist = new List<dialog>();
-            using (BinaryReader reader = new BinaryReader(File.Open(inFile, FileMode.Open, FileAccess.Read)))
+            EndianBinaryReader reader = new EndianBinaryReader(EndianBitConverter.Little, File.Open(inFile, FileMode.Open, FileAccess.Read));
+            reader.BaseStream.Position = 52;
+            int script_offset = reader.ReadInt32();
+            int script_size = reader.ReadInt32();
+            //int script_end = reader.ReadInt32();
+            reader.BaseStream.Position = script_offset;
+            MemoryStream scriptStream = new MemoryStream(reader.ReadBytes(script_size));
+            reader.Close();
+            while (scriptStream.Position != scriptStream.Length)
             {
-                reader.BaseStream.Position = 52;
-                long tmpl;
-                long tmpeof;
-                if (BitConverter.IsLittleEndian)
-                {
-                    tmpl = reader.ReadInt16();
-                    reader.BaseStream.Position = 60;
-                    tmpeof = reader.ReadInt16();
-                }
-                else
-                {
-                    byte[] tmpb = new byte[4];
-                    tmpb = reader.ReadBytes(2);
-                    Array.Reverse(tmpb);
-                    reader.BaseStream.Position = 60;
-                    byte[] tmpb2 = new byte[4];
-                    tmpb2 = reader.ReadBytes(2);
-                    Array.Reverse(tmpb2);
-                    tmpl = BitConverter.ToInt16(tmpb, 0);
-                    tmpeof = BitConverter.ToInt16(tmpb2, 0);
-                }
-                reader.BaseStream.Position = tmpl;
-                List<byte> mahByteArray = new List<byte>();
                 dialog d = new dialog();
-                d.offset = reader.BaseStream.Position;
-                while (reader.BaseStream.Position != tmpeof)
-                {
-                    mahByteArray.Add(reader.ReadByte());
-                    if (mahByteArray[mahByteArray.Count - 1] == 0x00)
-                    {
-                        d.text = Encoding.UTF8.GetString(mahByteArray.ToArray());
-                        d.size = mahByteArray.Count;
-                        dlist.Add(d);
-                        mahByteArray.Clear();
-                        d = new dialog();
-                        d.offset = reader.BaseStream.Position;
-                    }
-                }
+                d.offset = scriptStream.Position + script_offset;
+                d.text = ReadStringZ(scriptStream);
+                d.size = Encoding.UTF8.GetBytes(d.text).Length;
+                dlist.Add(d);
             }
             if (format)
             {
@@ -240,6 +200,23 @@ namespace AKB148GASBLib
                 throw;
                 //return false;
             }
+        }
+
+        public static string ReadStringZ(Stream reader)
+        {
+            List<byte> bArray = new List<byte>();
+            byte[] k = new byte[1];
+            for (int i = 0; i < 255; i++)
+            {
+                reader.Read(k, 0, 1);
+                if (k[0] == 0x00)
+                {
+                    bArray.Add(k[0]);
+                    break;
+                }
+                bArray.Add(k[0]);
+            }
+            return Encoding.UTF8.GetString(bArray.ToArray());
         }
     }
 

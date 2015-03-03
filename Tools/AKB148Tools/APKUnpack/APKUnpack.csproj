@@ -57,17 +57,18 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Miscutil\BigEndianBitConverter.cs" />
-    <Compile Include="Miscutil\EndianBinaryReader.cs" />
-    <Compile Include="Miscutil\EndianBitConverter.cs" />
-    <Compile Include="Miscutil\Endianness.cs" />
-    <Compile Include="Miscutil\LittleEndianBitConverter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="Readme.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EndianBinaryReader\EndianBinaryReader.csproj">
+      <Project>{4e6e3e08-0cf9-4548-bf0f-b10f793b3798}</Project>
+      <Name>EndianBinaryReader</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
