@@ -133,7 +133,7 @@ namespace AKB148GDumpText
                     {
                         foreach (dialog dl in dlist)
                         {
-                            writer.Write(Encoding.UTF8.GetBytes(dl.offset.ToString("X4")));
+                            writer.Write(Encoding.UTF8.GetBytes(dl.offset.ToString()));
                             writer.Write(Encoding.UTF8.GetBytes(";"));
                             writer.Write(Encoding.UTF8.GetBytes(dl.size.ToString()));
                             writer.Write(Encoding.UTF8.GetBytes(";"));
