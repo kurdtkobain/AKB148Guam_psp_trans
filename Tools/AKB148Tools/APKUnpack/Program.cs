@@ -308,7 +308,6 @@ namespace APKUnpack
             {
                 if ((c = (char)reader.ReadByte()) == 0)
                 {
-                    //result += c.ToString();
                     break;
                 }
                 result += c.ToString();

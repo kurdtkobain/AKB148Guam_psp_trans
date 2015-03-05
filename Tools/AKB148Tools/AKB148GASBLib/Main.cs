@@ -125,7 +125,7 @@ namespace AKB148GASBLib
             while (scriptStream.Position != scriptStream.Length)
             {
                 dialog d = new dialog();
-                d.offset = scriptStream.Position + script_offset;
+                d.offset = scriptStream.Position;// + script_offset;
                 d.text = ReadStringZ(scriptStream);
                 d.size = Encoding.UTF8.GetBytes(d.text).Length;
                 dlist.Add(d);
