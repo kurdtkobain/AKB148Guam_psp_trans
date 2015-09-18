@@ -92,6 +92,9 @@ namespace ASBTests
                   {
                       foreach (OPCodes opc in ops)
                       {
+                          //b.Write(Encoding.UTF8.GetBytes(opcodeMeaning(opc)));
+                          //b.Write(Encoding.UTF8.GetBytes(Environment.NewLine));
+
                           string tmp = String.Format("{0,-21} {1,-12} {2,-17} Param List: ",
                               "OPCode: " + opc.OPCode.ToString("X4"),
                               "UNKNOWN: " + opc.unk.ToString("X4"),
@@ -174,5 +177,61 @@ namespace ASBTests
                 }
             }
         }
+
+    private static string opcodeMeaning(OPCodes opc)
+    {
+        switch (opc.OPCode.ToString("X4"))
+        {
+            case "4B29":
+                if (opc.paramNum == 3)
+                {
+                    return "setSpeakingMemWithEventNum(" + opc.paramList[0].ToString("X4") + ", " + opc.paramList[1].ToString("X4") + ", " + opc.paramList[2].ToString("X4") + ")";
+                }
+                else
+                {
+                    return "setPlayerAsSpeaker(" + opc.paramList[0].ToString("X4") + "," + opc.paramList[1].ToString("X4") + ")";
+                }
+
+            case "0427":
+                return "SetLocName(" + opc.paramList[0].ToString("X4") + ")";
+
+            case "0327":
+                return "SetBGImage(" + opc.paramList[0].ToString("X4") + ")";
+
+            case "0029":
+                return "setDialogue(" + opc.paramList[0].ToString("X4") + ", " + opc.paramList[1].ToString("X4") + ")";
+
+            case "1A27":
+                return "setMemberWithUKN(" + opc.paramList[0].ToString("X4") + ", " + opc.paramList[1].ToString("X4") + ")";
+
+            case "1C27":
+                return "setVoiceForNextDialogue(" + opc.paramList[0].ToString("X4") + ", " + opc.paramList[1].ToString("X4") + ")";
+
+            case "0229":
+                return "setChoice(" + opc.paramList[0].ToString("X4") + ", " + opc.paramList[1].ToString("X4") + ", " + opc.paramList[2].ToString("X4") + ")";
+
+            case "2927":
+                if (opc.paramList.Count != 0)
+                {
+                    return "CHOICE_UNK(" + opc.paramList[0].ToString("X4") + ")";
+                }
+                else
+                {
+                    return "CHOICE_UNK()";
+                }
+
+            default:
+                string tmp = "UKN" + opc.OPCode.ToString("X4") + "(";
+                for(int i = 0; i < opc.paramNum; i++){
+                    tmp += opc.paramList[i].ToString("X4");
+                    if ((i + 1) != opc.paramNum)
+                    {
+                        tmp += " , ";
+                    }
+                }
+                tmp += ")";
+                return tmp;
+        }
+    }
     }
 }
