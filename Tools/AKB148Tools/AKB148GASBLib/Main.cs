@@ -65,11 +65,10 @@ namespace AKB148GASBLib
 
         public static string getDialogFromOffset(string inFile, int offset)
         {
-
+            Header head = getHeader(inFile);
+            int script_offset = head.sOffset;
+            int script_size = head.sSize;
             EndianBinaryReader reader = new EndianBinaryReader(EndianBitConverter.Little, File.Open(inFile, FileMode.Open, FileAccess.Read));
-            reader.BaseStream.Position = 52;
-            int script_offset = reader.ReadInt32();
-            int script_size = reader.ReadInt32();
             reader.BaseStream.Position = script_offset;
             MemoryStream scriptStream = new MemoryStream(reader.ReadBytes(script_size));
             reader.Close();
@@ -87,11 +86,10 @@ namespace AKB148GASBLib
         {
             pOps.MaxDegreeOfParallelism = threads;
             List<dialog> dlist = new List<dialog>();
+            Header head = getHeader(inFile);
+            int script_offset = head.sOffset;
+            int script_size = head.sSize;
             EndianBinaryReader reader = new EndianBinaryReader(EndianBitConverter.Little, File.Open(inFile, FileMode.Open, FileAccess.Read));
-            reader.BaseStream.Position = 52;
-            int script_offset = reader.ReadInt32();
-            int script_size = reader.ReadInt32();
-            //int script_end = reader.ReadInt32();
             reader.BaseStream.Position = script_offset;
             MemoryStream scriptStream = new MemoryStream(reader.ReadBytes(script_size));
             reader.Close();
@@ -177,11 +175,10 @@ namespace AKB148GASBLib
         {
             pOps.MaxDegreeOfParallelism = threads;
             List<dialog> dlist = new List<dialog>();
+            Header head = getHeader(inFile);
+            int script_offset = head.sOffset;
+            int script_size = head.sSize;
             EndianBinaryReader reader = new EndianBinaryReader(EndianBitConverter.Little, File.Open(inFile, FileMode.Open, FileAccess.Read));
-            reader.BaseStream.Position = 52;
-            int script_offset = reader.ReadInt32();
-            int script_size = reader.ReadInt32();
-            //int script_end = reader.ReadInt32();
             reader.BaseStream.Position = script_offset;
             MemoryStream scriptStream = new MemoryStream(reader.ReadBytes(script_size));
             reader.Close();
