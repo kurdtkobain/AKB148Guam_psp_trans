@@ -8,34 +8,6 @@ using AKB148GASBLib;
 
 namespace ASBTests
 {
-
-    class PointerTOC
-    {
-        public int sOffset;
-        public int UKN1;
-        public int UKN2;
-        public int pOffset;
-        public int pSize;
-    }
-
-    class PointerData
-    {
-        public int Offset;
-        public int Size;
-        public byte[] Data;
-    }
-    class OPCodes
-    {
-        public long Offset;
-        public int paramNum;
-        public int UKN1;
-        public int UKN2;
-        public int UKNFlag;
-        public int OPCode;
-        public List<int> paramList = new List<int>();
-        public List<byte> RawBytes = new List<byte>();
-    }
-
     class Program
     {
         static void Main(string[] args)
@@ -48,55 +20,13 @@ namespace ASBTests
 
         private static void RUNTest(string inFile, bool dumpHexToo = false)
         {
-            EndianBinaryReader reader = new EndianBinaryReader(EndianBitConverter.Little, File.Open(inFile, FileMode.Open, FileAccess.Read));
-            reader.ReadInt32(); //always 0x00000000
-            string fileName = Encoding.UTF8.GetString(reader.ReadBytes(15));
-            reader.ReadByte(); //0x00
-            reader.ReadBytes(16); //always 0's
-            int UKN1 = reader.ReadInt32(); //always 0x44000000
-            int UKN2 = reader.ReadInt32(); //always 0x99000000
-            int nOffset = reader.ReadInt32(); //always 0x380C0000
-            int nSize = reader.ReadInt32();
-            int sOffset = reader.ReadInt32();
-            int sSize = reader.ReadInt32();
-            int sEOF = reader.ReadInt32();
-            int UKN3 = reader.ReadInt32(); //always 0x09000000
-            List<PointerTOC> tst = new List<PointerTOC>();
-            while (reader.BaseStream.Position < nOffset)
-            {
-                PointerTOC list = new PointerTOC();
-                list.sOffset = reader.ReadInt32();
-                list.UKN1 = reader.ReadInt32();
-                list.UKN2 = reader.ReadInt32();
-                list.pOffset = reader.ReadInt32();
-                list.pSize = reader.ReadInt32();
-                tst.Add(list);
-
-            }
-            long tmpoff = reader.BaseStream.Position;
-            List<PointerData> pointD = new List<PointerData>();
-            foreach (PointerTOC p in tst)
-            {
-                PointerData pData = new PointerData();
-                pData.Offset = p.pOffset + nOffset;
-                reader.BaseStream.Position = pData.Offset;
-                pData.Size = p.pSize;
-                pData.Data = reader.ReadBytes(pData.Size);
-                pointD.Add(pData);
-            }
-            reader.Close();
-            Array.Reverse(pointD[pointD.Count - 2].Data);
-            MemoryStream pDataStream = new MemoryStream(pointD[pointD.Count - 2].Data);
-            EndianBinaryReader R = new EndianBinaryReader(EndianBitConverter.Big, pDataStream);
-            List<OPCodes> ops = new List<OPCodes>();
-            checkOpcode(R, ops, pointD[pointD.Count - 2].Size);
-            R.Close();
-            ops.Reverse();
+            
+            List<ASBTools.ScriptData> ops = AKB148GASBLib.ASBTools.getScript(inFile);
            
-                using (BinaryWriter b = new BinaryWriter(File.Open(fileName + ".txt", FileMode.Create)))
+                using (BinaryWriter b = new BinaryWriter(File.Open(Path.GetFileName(inFile) + ".txt", FileMode.Create)))
                 {
 
-                    foreach (OPCodes opc in ops)
+                    foreach (ASBTools.ScriptData opc in ops)
                     {
                         b.Write(Encoding.UTF8.GetBytes(opcodeMeaning(opc, inFile)));
                         b.Write(Encoding.UTF8.GetBytes(Environment.NewLine));
@@ -104,10 +34,10 @@ namespace ASBTests
                 }
             if (dumpHexToo)
             {
-                using (BinaryWriter b = new BinaryWriter(File.Open(fileName + ".HEX.txt", FileMode.Create)))
+                using (BinaryWriter b = new BinaryWriter(File.Open(Path.GetFileName(inFile) + ".HEX.txt", FileMode.Create)))
                 {
 
-                    foreach (OPCodes opc in ops)
+                    foreach (ASBTools.ScriptData opc in ops)
                     {
                         foreach (byte by in opc.RawBytes)
                         {
@@ -120,80 +50,7 @@ namespace ASBTests
             }
         }
 
-        private static void checkOpcode(EndianBinaryReader s, List<OPCodes> opC, int size)
-        {
-
-            OPCodes op = new OPCodes();
-            s.ReadByte();
-            while (s.BaseStream.Position < size)
-            {
-                op.Offset = s.BaseStream.Position;
-                op.paramNum = s.ReadByte();
-                op.RawBytes.Add((byte)op.paramNum);
-                op.UKN1 = s.ReadByte();
-                op.RawBytes.Add((byte)op.UKN1);
-                op.UKN2 = s.ReadByte();
-                op.RawBytes.Add((byte)op.UKN2);
-                if (op.UKN2 != 0x00)
-                {
-                    op.UKNFlag = s.ReadByte();
-                    op.RawBytes.Add((byte)op.UKNFlag);
-                    byte tmpByte = s.ReadByte();
-                    op.RawBytes.Add(tmpByte);
-                    if (tmpByte != 0x21)
-                    {
-                        if (tmpByte == 0x00)
-                        {
-                            byte[] tmpbyts = s.ReadBytes(14);
-                            op.RawBytes.AddRange(tmpbyts);
-                        }
-                        else
-                        {
-                            byte tmpbyt = s.ReadByte();
-                            op.RawBytes.Add(tmpbyt);
-                        }
-                    }
-                }
-                else
-                {
-                    op.UKNFlag = s.ReadByte();
-                    op.RawBytes.Add((byte)op.UKNFlag);
-                    op.OPCode = s.ReadInt16();
-                    byte[] intBytes = BitConverter.GetBytes(op.OPCode);
-                    if (BitConverter.IsLittleEndian)
-                        Array.Reverse(intBytes);
-                    op.RawBytes.AddRange(intBytes);
-                    if ((op.OPCode == 0x0000 && op.UKNFlag == 0x00) || op.UKNFlag == 0x02 || (op.UKNFlag == 0x01 && op.OPCode == 0x0000))
-                    {
-                        byte[] tmpByteop = s.ReadBytes(3);
-                        op.RawBytes.AddRange(tmpByteop);
-                    }
-                    else
-                    {
-                        if (op.paramNum != 0)
-                        {
-                            for (int g = 0; g < op.paramNum; g++)
-                            {
-                                int tmpprams = s.ReadInt32();
-                                byte[] intBytes2 = BitConverter.GetBytes(tmpprams);
-                                if (BitConverter.IsLittleEndian)
-                                    Array.Reverse(intBytes2);
-                                op.RawBytes.AddRange(intBytes2);
-                                op.paramList.Add(tmpprams);
-                                byte tmpprambyte = s.ReadByte();
-                                op.RawBytes.Add(tmpprambyte);
-                            }
-                        }
-                    }
-                }
-                op.paramList.Reverse();
-                opC.Add(op);
-                op = new OPCodes();
-
-            }
-        }
-
-        private static string opcodeMeaning(OPCodes opc, string infile)
+        private static string opcodeMeaning(ASBTools.ScriptData opc, string infile)
         {
             switch (opc.OPCode.ToString("X4"))
             {
@@ -206,7 +63,7 @@ namespace ASBTests
                 case "4B29":
                     if (opc.paramNum == 3)
                     {
-                        return "setSpeakerAsMemberWithEvent(" + opc.paramList[0].ToString("X4") + ", " + Members.getMemberName(opc.paramList[1]) + ", " + ASBTools.getDialogFromOffset(infile, opc.paramList[2]) + ")";
+                        return "setSpeakerAsMemberWithVoice(" + opc.paramList[0].ToString("X4") + ", " + Members.getMemberName(opc.paramList[1]) + ", " + ASBTools.getDialogFromOffset(infile, opc.paramList[2]) + ")";
                     }
                     else
                     {

@@ -14,6 +14,50 @@ namespace AKB148GASBLib
 {
     public class ASBTools
     {
+        public class Header
+        {
+            public int ZERO; //always 0x00000000
+            public string fileName;
+            public byte ZERO2; //0x00
+            public byte[] ZEROS; //always 0's
+            public int UKN1; //always 0x44000000
+            public int UKN2; //always 0x99000000
+            public int nOffset; //always 0x380C0000
+            public int nSize;
+            public int sOffset;
+            public int sSize;
+            public int sEOF;
+            public int UKN3; //always 0x09000000
+            public long STARTOFF;
+
+        }
+        public class PointerTOC
+        {
+            public int sOffset;
+            public int UKN1;
+            public int UKN2;
+            public int pOffset;
+            public int pSize;
+        }
+
+        public class PointerData
+        {
+            public int Offset;
+            public int Size;
+            public byte[] Data;
+        }
+        public class ScriptData
+        {
+            public long Offset;
+            public int paramNum;
+            public int UKN1;
+            public int UKN2;
+            public int UKNFlag;
+            public int OPCode;
+            public List<int> paramList = new List<int>();
+            public List<byte> RawBytes = new List<byte>();
+        }
+
         private static object fLock = new Object();
         private static int threads = 4;
         private static ParallelOptions pOps = new ParallelOptions();
@@ -237,7 +281,148 @@ namespace AKB148GASBLib
             }
             return Encoding.UTF8.GetString(bArray.ToArray());
         }
-    }
+
+        public static List<ScriptData> getScript(string inFile)
+        {
+            Header head = getHeader(inFile);
+            List<PointerData> pointD = getPointerData(inFile);
+            Array.Reverse(pointD[pointD.Count -2].Data);
+            MemoryStream pDataStream = new MemoryStream(pointD[pointD.Count - 2].Data);
+            EndianBinaryReader R = new EndianBinaryReader(EndianBitConverter.Big, pDataStream);
+            List<ScriptData> ops = new List<ScriptData>();
+            parseScript(R, ops, pointD[pointD.Count - 2].Size);
+            R.Close();
+            ops.Reverse();
+            return ops;
+
+        }
+
+        private static void parseScript(EndianBinaryReader s, List<ScriptData> opC, int size)
+        {
+
+            ScriptData op = new ScriptData();
+            s.ReadByte();
+            while (s.BaseStream.Position < size)
+            {
+                op.Offset = s.BaseStream.Position;
+                op.paramNum = s.ReadByte();
+                op.RawBytes.Add((byte)op.paramNum);
+                op.UKN1 = s.ReadByte();
+                op.RawBytes.Add((byte)op.UKN1);
+                op.UKN2 = s.ReadByte();
+                op.RawBytes.Add((byte)op.UKN2);
+                if (op.UKN2 != 0x00)
+                {
+                    op.UKNFlag = s.ReadByte();
+                    op.RawBytes.Add((byte)op.UKNFlag);
+                    byte tmpByte = s.ReadByte();
+                    op.RawBytes.Add(tmpByte);
+                    if (tmpByte != 0x21)
+                    {
+                        if (tmpByte == 0x00)
+                        {
+                            byte[] tmpbyts = s.ReadBytes(14);
+                            op.RawBytes.AddRange(tmpbyts);
+                        }
+                        else
+                        {
+                            byte tmpbyt = s.ReadByte();
+                            op.RawBytes.Add(tmpbyt);
+                        }
+                    }
+                }
+                else
+                {
+                    op.UKNFlag = s.ReadByte();
+                    op.RawBytes.Add((byte)op.UKNFlag);
+                    op.OPCode = s.ReadInt16();
+                    byte[] intBytes = BitConverter.GetBytes(op.OPCode);
+                    if (BitConverter.IsLittleEndian)
+                        Array.Reverse(intBytes);
+                    op.RawBytes.AddRange(intBytes);
+                    if ((op.OPCode == 0x0000 && op.UKNFlag == 0x00) || op.UKNFlag == 0x02 || (op.UKNFlag == 0x01 && op.OPCode == 0x0000))
+                    {
+                        byte[] tmpByteop = s.ReadBytes(3);
+                        op.RawBytes.AddRange(tmpByteop);
+                    }
+                    else
+                    {
+                        if (op.paramNum != 0)
+                        {
+                            for (int g = 0; g < op.paramNum; g++)
+                            {
+                                int tmpprams = s.ReadInt32();
+                                byte[] intBytes2 = BitConverter.GetBytes(tmpprams);
+                                if (BitConverter.IsLittleEndian)
+                                    Array.Reverse(intBytes2);
+                                op.RawBytes.AddRange(intBytes2);
+                                op.paramList.Add(tmpprams);
+                                byte tmpprambyte = s.ReadByte();
+                                op.RawBytes.Add(tmpprambyte);
+                            }
+                        }
+                    }
+                }
+                op.paramList.Reverse();
+                opC.Add(op);
+                op = new ScriptData();
+
+            }
+        }
+
+        public static Header getHeader(string inFile)
+        {
+            Header head = new Header();
+            EndianBinaryReader reader = new EndianBinaryReader(EndianBitConverter.Little, File.Open(inFile, FileMode.Open, FileAccess.Read));
+            head.ZERO = reader.ReadInt32(); //always 0x00000000
+            head.fileName = Encoding.UTF8.GetString(reader.ReadBytes(15));
+            head.ZERO2 =reader.ReadByte(); //0x00
+            head.ZEROS = reader.ReadBytes(16); //always 0's
+            head.UKN1 = reader.ReadInt32(); //always 0x44000000
+            head.UKN2 = reader.ReadInt32(); //always 0x99000000
+            head.nOffset = reader.ReadInt32(); //always 0x380C0000
+            head.nSize = reader.ReadInt32();
+            head.sOffset = reader.ReadInt32();
+            head.sSize = reader.ReadInt32();
+            head.sEOF = reader.ReadInt32();
+            head.UKN3 = reader.ReadInt32(); //always 0x09000000
+            head.STARTOFF = reader.BaseStream.Position;
+            reader.Close();
+            return head;
+        }
+
+        public static List<PointerData> getPointerData(string inFile)
+        {
+            Header head = getHeader(inFile);
+            EndianBinaryReader reader = new EndianBinaryReader(EndianBitConverter.Little, File.Open(inFile, FileMode.Open, FileAccess.Read));
+            reader.BaseStream.Position = head.STARTOFF;
+            List<PointerTOC> tst = new List<PointerTOC>();
+            while (reader.BaseStream.Position < head.nOffset)
+            {
+                PointerTOC list = new PointerTOC();
+                list.sOffset = reader.ReadInt32();
+                list.UKN1 = reader.ReadInt32();
+                list.UKN2 = reader.ReadInt32();
+                list.pOffset = reader.ReadInt32();
+                list.pSize = reader.ReadInt32();
+                tst.Add(list);
+
+            }
+            long tmpoff = reader.BaseStream.Position;
+            List<PointerData> pointD = new List<PointerData>();
+            foreach (PointerTOC p in tst)
+            {
+                PointerData pData = new PointerData();
+                pData.Offset = p.pOffset + head.nOffset;
+                reader.BaseStream.Position = pData.Offset;
+                pData.Size = p.pSize;
+                pData.Data = reader.ReadBytes(pData.Size);
+                pointD.Add(pData);
+            }
+            reader.Close();
+            return pointD;
+        }
+        }
 
     public class dialog : INotifyPropertyChanged
     {
@@ -257,4 +442,6 @@ namespace AKB148GASBLib
             }
         }
     }
+
+  
 }
