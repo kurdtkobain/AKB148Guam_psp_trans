@@ -26,46 +26,27 @@ namespace ASBTests
     }
     class OPCodes
     {
+        public long Offset;
         public int paramNum;
         public int UKN1;
         public int UKN2;
         public int UKNFlag;
         public int OPCode;
-        public byte[] Special;
-
         public List<int> paramList = new List<int>();
+        public List<byte> RawBytes = new List<byte>();
     }
 
     class Program
     {
         static void Main(string[] args)
         {
-            FileStream ostrm;
-            StreamWriter writer;
-            TextWriter oldOut = Console.Out;
-            try
-            {
-                ostrm = new FileStream("./Redirect.txt", FileMode.Create, FileAccess.Write);
-                writer = new StreamWriter(ostrm);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Cannot open Redirect.txt for writing");
-                Console.WriteLine(e.Message);
-                return;
-            }
-            Console.SetOut(writer);
             if (args.Length > 1)
                 RUNTest(args[0], true);
             else
                 RUNTest(args[0]);
-            Console.SetOut(oldOut);
-            writer.Close();
-            ostrm.Close();
-            Console.WriteLine("Done");
         }
 
-        private static void RUNTest(string inFile, bool dumpHexOnly = false)
+        private static void RUNTest(string inFile, bool dumpHexToo = false)
         {
             EndianBinaryReader reader = new EndianBinaryReader(EndianBitConverter.Little, File.Open(inFile, FileMode.Open, FileAccess.Read));
             reader.ReadInt32(); //always 0x00000000
@@ -100,50 +81,42 @@ namespace ASBTests
                 pData.Offset = p.pOffset + nOffset;
                 reader.BaseStream.Position = pData.Offset;
                 pData.Size = p.pSize;
-                //pData.Data = new byte[pData.Size];
                 pData.Data = reader.ReadBytes(pData.Size);
                 pointD.Add(pData);
             }
             reader.Close();
             Array.Reverse(pointD[pointD.Count - 2].Data);
-            if (dumpHexOnly)
-            {
-
-                using (BinaryWriter b = new BinaryWriter(File.Open(fileName + ".HEX.txt", FileMode.Create)))
-                {
-                    foreach (byte opc in pointD[pointD.Count - 2].Data)
-                    {
-                        b.Write(Encoding.UTF8.GetBytes(opc.ToString("X2")));
-                        b.Write(Encoding.UTF8.GetBytes(" "));
-                    }
-                }
-                return;
-            }
             MemoryStream pDataStream = new MemoryStream(pointD[pointD.Count - 2].Data);
             EndianBinaryReader R = new EndianBinaryReader(EndianBitConverter.Big, pDataStream);
             List<OPCodes> ops = new List<OPCodes>();
-            checkOpcode(R, ops,pointD[pointD.Count -2].Size);
+            checkOpcode(R, ops, pointD[pointD.Count - 2].Size);
             R.Close();
             ops.Reverse();
-            using (BinaryWriter b = new BinaryWriter(File.Open(fileName + ".txt", FileMode.Create)))
-            {
-                foreach (OPCodes opc in ops)
+           
+                using (BinaryWriter b = new BinaryWriter(File.Open(fileName + ".txt", FileMode.Create)))
                 {
-                    b.Write(Encoding.UTF8.GetBytes(opcodeMeaning(opc, inFile)));
-                    b.Write(Encoding.UTF8.GetBytes(Environment.NewLine));
 
-                    /*string tmp = String.Format("{0,-21} {1,-12} {2,-17} Param List: ",
-                        "OPCode: " + opc.OPCode.ToString("X4"),
-                        "UNKNOWN: " + opc.unk.ToString("X4"),
-                        "Params: " + opc.paramNum.ToString());
-                    b.Write(Encoding.UTF8.GetBytes(tmp));
-                    foreach (int i in opc.paramList)
+                    foreach (OPCodes opc in ops)
                     {
-                        b.Write(Encoding.UTF8.GetBytes(i.ToString("X4")));
-                        b.Write(Encoding.UTF8.GetBytes("  "));
+                        b.Write(Encoding.UTF8.GetBytes(opcodeMeaning(opc, inFile)));
+                        b.Write(Encoding.UTF8.GetBytes(Environment.NewLine));
                     }
-                    b.Write(Encoding.UTF8.GetBytes(Environment.NewLine));*/
                 }
+            if (dumpHexToo)
+            {
+                using (BinaryWriter b = new BinaryWriter(File.Open(fileName + ".HEX.txt", FileMode.Create)))
+                {
+
+                    foreach (OPCodes opc in ops)
+                    {
+                        foreach (byte by in opc.RawBytes)
+                        {
+                            b.Write(Encoding.UTF8.GetBytes(by.ToString("X2") + " "));
+                        }
+                        b.Write(Encoding.UTF8.GetBytes(Environment.NewLine));
+                    }
+                }
+
             }
         }
 
@@ -151,64 +124,64 @@ namespace ASBTests
         {
 
             OPCodes op = new OPCodes();
-            Console.WriteLine(s.ReadByte().ToString("X2") + " ");
+            s.ReadByte();
             while (s.BaseStream.Position < size)
             {
+                op.Offset = s.BaseStream.Position;
                 op.paramNum = s.ReadByte();
-                Console.Write(op.paramNum.ToString("X2") + " ");
+                op.RawBytes.Add((byte)op.paramNum);
                 op.UKN1 = s.ReadByte();
-                Console.Write(op.UKN1.ToString("X2") + " ");
+                op.RawBytes.Add((byte)op.UKN1);
                 op.UKN2 = s.ReadByte();
-                Console.Write(op.UKN2.ToString("X2") + " ");
+                op.RawBytes.Add((byte)op.UKN2);
                 if (op.UKN2 != 0x00)
                 {
                     op.UKNFlag = s.ReadByte();
-                    Console.Write(op.UKNFlag.ToString("X2") + " ");
+                    op.RawBytes.Add((byte)op.UKNFlag);
                     byte tmpByte = s.ReadByte();
-
+                    op.RawBytes.Add(tmpByte);
                     if (tmpByte != 0x21)
                     {
-                        if (tmpByte == 0x00) {
-                            op.Special = s.ReadBytes(14);
-                            foreach (byte b in op.Special)
-                                Console.Write(b.ToString("X2") + " ");
+                        if (tmpByte == 0x00)
+                        {
+                            byte[] tmpbyts = s.ReadBytes(14);
+                            op.RawBytes.AddRange(tmpbyts);
                         }
                         else
                         {
-                            op.Special = new byte[] { tmpByte, s.ReadByte() };
-                            foreach (byte b in op.Special)
-                                Console.Write(b.ToString("X2") + " ");
+                            byte tmpbyt = s.ReadByte();
+                            op.RawBytes.Add(tmpbyt);
                         }
-                    }
-                    else
-                    {
-                        Console.Write(tmpByte.ToString("X2") + " ");
                     }
                 }
                 else
                 {
                     op.UKNFlag = s.ReadByte();
-                    Console.Write(op.UKNFlag.ToString("X2") + " ");
+                    op.RawBytes.Add((byte)op.UKNFlag);
                     op.OPCode = s.ReadInt16();
-                    Console.Write(op.OPCode.ToString("X4") + " ");
+                    byte[] intBytes = BitConverter.GetBytes(op.OPCode);
+                    if (BitConverter.IsLittleEndian)
+                        Array.Reverse(intBytes);
+                    op.RawBytes.AddRange(intBytes);
                     if ((op.OPCode == 0x0000 && op.UKNFlag == 0x00) || op.UKNFlag == 0x02 || (op.UKNFlag == 0x01 && op.OPCode == 0x0000))
                     {
-                        
-                        op.Special = s.ReadBytes(3);
-                        foreach (byte b in op.Special)
-                            Console.Write(b.ToString("X2") + " ");
+                        byte[] tmpByteop = s.ReadBytes(3);
+                        op.RawBytes.AddRange(tmpByteop);
                     }
-                    else{
+                    else
+                    {
                         if (op.paramNum != 0)
                         {
                             for (int g = 0; g < op.paramNum; g++)
                             {
                                 int tmpprams = s.ReadInt32();
+                                byte[] intBytes2 = BitConverter.GetBytes(tmpprams);
+                                if (BitConverter.IsLittleEndian)
+                                    Array.Reverse(intBytes2);
+                                op.RawBytes.AddRange(intBytes2);
                                 op.paramList.Add(tmpprams);
-                                foreach(int p in op.paramList)
-                                    Console.Write(p.ToString("X4") + " ");
-                                Console.Write(s.ReadByte().ToString("X2") + " ");
-
+                                byte tmpprambyte = s.ReadByte();
+                                op.RawBytes.Add(tmpprambyte);
                             }
                         }
                     }
@@ -216,36 +189,20 @@ namespace ASBTests
                 op.paramList.Reverse();
                 opC.Add(op);
                 op = new OPCodes();
-                Console.Write(Environment.NewLine);
 
             }
-
-            /*OPCodes op = new OPCodes();
-            while (s.BaseStream.Position < size)
-            {
-                byte tmp = s.ReadByte();
-                if (tmp == 0x27 || tmp == 0x29)
-                {
-                    s.BaseStream.Position -= 1;
-                    op.OPCode = s.ReadInt16();
-                    op.unk = s.ReadInt16();
-                    s.ReadByte();
-                    op.paramNum = s.ReadByte();
-                    opC.Add(op);
-                    op = new OPCodes();
-                }
-                else if (tmp == 0x01)
-                {
-                    op.paramList.Add(s.ReadInt32());
-                    
-                }
-            }*/
         }
 
         private static string opcodeMeaning(OPCodes opc, string infile)
         {
             switch (opc.OPCode.ToString("X4"))
             {
+                case "0000":
+                    StringBuilder str = new StringBuilder();
+                    str.Append("Special :");
+                    foreach (byte b in opc.RawBytes)
+                        str.Append(" " + b.ToString("X2"));
+                    return str.ToString();
                 case "4B29":
                     if (opc.paramNum == 3)
                     {
