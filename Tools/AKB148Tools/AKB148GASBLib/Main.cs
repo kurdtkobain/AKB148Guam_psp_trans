@@ -63,7 +63,7 @@ namespace AKB148GASBLib
         private static ParallelOptions pOps = new ParallelOptions();
 
 
-        public static string getDialogFromOffset(string inFile, int offset)
+        public static string getDialogFromOffset(string inFile, int offset,bool noParenth = false)
         {
             Header head = getHeader(inFile);
             int script_offset = head.sOffset;
@@ -73,7 +73,11 @@ namespace AKB148GASBLib
             MemoryStream scriptStream = new MemoryStream(reader.ReadBytes(script_size));
             reader.Close();
             scriptStream.Position = offset;
-            string output = "\"" + ReadStringZ(scriptStream) +"\"";
+            string output;
+            if (!noParenth)
+                output = "\"" + ReadStringZ(scriptStream) +"\"";
+            else
+                output = ReadStringZ(scriptStream);
             output = output.Replace(Encoding.UTF8.GetString(new byte[] { 0x0A }), "<LINEEND>");
             output = output.Replace(Encoding.UTF8.GetString(new byte[] { 0x00 }), "");
             scriptStream.Close();
