@@ -13,7 +13,7 @@
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Defines.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -48,6 +49,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AKB148GASBLib\AKB148GASBLib.csproj">
+      <Project>{d6cfeef2-5af3-4908-b5c7-67b62b87ed7c}</Project>
+      <Name>AKB148GASBLib</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EndianBinaryReader\EndianBinaryReader.csproj">
       <Project>{4E6E3E08-0CF9-4548-BF0F-B10F793B3798}</Project>
       <Name>EndianBinaryReader</Name>

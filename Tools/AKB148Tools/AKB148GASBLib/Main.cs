@@ -18,6 +18,25 @@ namespace AKB148GASBLib
         private static int threads = 4;
         private static ParallelOptions pOps = new ParallelOptions();
 
+
+        public static string getDialogFromOffset(string inFile, int offset)
+        {
+
+            EndianBinaryReader reader = new EndianBinaryReader(EndianBitConverter.Little, File.Open(inFile, FileMode.Open, FileAccess.Read));
+            reader.BaseStream.Position = 52;
+            int script_offset = reader.ReadInt32();
+            int script_size = reader.ReadInt32();
+            reader.BaseStream.Position = script_offset;
+            MemoryStream scriptStream = new MemoryStream(reader.ReadBytes(script_size));
+            reader.Close();
+            scriptStream.Position = offset;
+            string output = "\"" + ReadStringZ(scriptStream) +"\"";
+            output = output.Replace(Encoding.UTF8.GetString(new byte[] { 0x0A }), "<LINEEND>");
+            output = output.Replace(Encoding.UTF8.GetString(new byte[] { 0x00 }), "");
+            scriptStream.Close();
+            return output;
+        }
+
         // Summary:
         //     Gets a List<dialog> from asb file.
         public static List<dialog> getDialogList(string inFile, bool format = false, bool eventOnly = false)
