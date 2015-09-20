@@ -42,6 +42,15 @@ namespace StoryTest
 
         private void button2_Click(object sender, EventArgs e)
         {
+
+            Thread pa = new Thread(playFileDS);
+            pa.IsBackground = true;
+            pa.Start();
+            
+        }
+
+        private void playFileDS()
+        {
             int hr;
             EventCode ev;
             FilterGraph fg;

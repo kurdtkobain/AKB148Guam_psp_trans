@@ -58,6 +58,12 @@ namespace AKB148GASBLib
             public List<byte> RawBytes = new List<byte>();
         }
 
+        public class DialougeData
+        {
+            public long Offset;
+            public string Text;
+        }
+
         private static object fLock = new Object();
         private static int threads = 4;
         private static ParallelOptions pOps = new ParallelOptions();
@@ -82,6 +88,22 @@ namespace AKB148GASBLib
             output = output.Replace(Encoding.UTF8.GetString(new byte[] { 0x00 }), "");
             scriptStream.Close();
             return output;
+        }
+
+        public static List<DialougeData> getDialogueText(string inFile)
+        {
+            List<DialougeData> ddlist = new List<DialougeData>();
+            List<dialog> dlist = getDialogListRAW(inFile);
+            foreach(dialog d in dlist)
+            {
+                DialougeData dd = new DialougeData();
+                dd.Offset = d.offset;
+                dd.Text = d.text;
+                dd.Text = dd.Text.Replace(Encoding.UTF8.GetString(new byte[] { 0x0A }), "<LINEEND>");
+                dd.Text = dd.Text.Replace(Encoding.UTF8.GetString(new byte[] { 0x00 }), "");
+                ddlist.Add(dd);
+            }
+            return ddlist;
         }
 
         // Summary:
@@ -298,12 +320,22 @@ namespace AKB148GASBLib
 
         }
 
+        public static byte[] getScriptRaw(string inFile)
+        {
+            Header head = getHeader(inFile);
+            List<PointerData> pointD = getPointerData(inFile);
+            Array.Reverse(pointD[pointD.Count - 2].Data);
+            MemoryStream pDataStream = new MemoryStream(pointD[pointD.Count - 2].Data);
+            return pDataStream.ToArray();
+
+        }
+
         private static void parseScript(EndianBinaryReader s, List<ScriptData> opC, int size)
         {
 
             ScriptData op = new ScriptData();
             s.ReadByte();
-            while (s.BaseStream.Position < size)
+            while (s.BaseStream.Position < s.BaseStream.Length)
             {
                 op.Offset = s.BaseStream.Position;
                 op.paramNum = s.ReadByte();
@@ -320,10 +352,22 @@ namespace AKB148GASBLib
                     op.RawBytes.Add(tmpByte);
                     if (tmpByte != 0x21)
                     {
-                        if (tmpByte == 0x00)
+                        if (tmpByte == 0x00 || tmpByte == 0x22 || tmpByte == 0x04)
                         {
-                            byte[] tmpbyts = s.ReadBytes(14);
-                            op.RawBytes.AddRange(tmpbyts);
+                            while (true)
+                            {
+                                byte tmpbytets = s.ReadByte();
+                                op.RawBytes.Add(tmpbytets);
+                                if (tmpbytets == (byte)0x05) {
+                                    byte tmpbytets2 = s.ReadByte();
+                                    if (tmpbytets2 != 0x04)
+                                    {
+                                        s.BaseStream.Position -=1;
+                                        break;
+                                    }
+                                    op.RawBytes.Add(tmpbytets2);
+                                }
+                            }
                         }
                         else
                         {
@@ -341,12 +385,26 @@ namespace AKB148GASBLib
                     if (BitConverter.IsLittleEndian)
                         Array.Reverse(intBytes);
                     op.RawBytes.AddRange(intBytes);
+                    if (intBytes[3] != 0x27 && intBytes[3] != 0x29 && intBytes[3] != 0x00)
+                    {
+                        byte[] errby = s.ReadBytes(4);
+
+
+                        Console.WriteLine("WRONGOPCODE");
+
+
+
+                    }
                     if ((op.OPCode == 0x0000 && op.UKNFlag == 0x00) || op.UKNFlag == 0x02 || (op.UKNFlag == 0x01 && op.OPCode == 0x0000))
                     {
                         byte[] tmpByteop = s.ReadBytes(3);
                         op.RawBytes.AddRange(tmpByteop);
-                    }
-                    else
+                    } else if (op.OPCode == 0x7301 ) {
+
+                        byte[] tmpByteop = s.ReadBytes(5);
+                        op.RawBytes.AddRange(tmpByteop);
+
+                    } else
                     {
                         if (op.paramNum != 0)
                         {
