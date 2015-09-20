@@ -35,6 +35,7 @@ namespace ASBTests
         }
         private static void RUNTest(string inFile, bool dumpHex = false)
         {
+            Directory.CreateDirectory("Dump");
             diagDataList = ASBTools.getDialogueText(inFile);
             Console.WriteLine("Parsing " + inFile);
             
