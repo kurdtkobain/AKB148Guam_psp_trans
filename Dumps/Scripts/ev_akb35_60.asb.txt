@@ -1,0 +1,46 @@
+UKN0127()
+UKN7B27()
+UKN0F27()
+setSpeakerAsPlayer(0000,"Player")
+setDialogue("そういえば……<LINEEND>そろそろゆきりんの誕生日だな。", B6E5)
+playSE() Flag:03
+UKN2027(0007)
+UKN1B27(0023 , 296D , 0000)
+SetBGImage(8510000)
+UKN0827()
+UKN1827(01F4)
+setSpeakerAsPlayer(0000,"Player")
+setDialogue("何日だっけ？<LINEEND>え～っと……。", B6E6)
+UKN3027(0000)
+setChoice("７月１５日", "７月２５日", "７月１０日")
+Special : 00 00 20 9A 00 00 20 24 00 00 1F A9 00 00 1F 4A 04 24 05
+setSpeakerAsPlayer(0000,"Player")
+setDialogue("そうだ、７月１５日だ！", B6E7)
+setSpeakerAsPlayer(0000,"Player")
+setDialogue("よし、忘れずにおめでとうメールを<LINEEND>送っておかないとな。", B6E8)
+Special : 00 00 00 00 00 00 00 00 00 20 0B
+UKN1127()
+UKN3027(0001)
+Special : 00 00 20 9A 21
+setSpeakerAsPlayer(0000,"Player")
+setDialogue("……なんか違う気がするな。", B6E9)
+playSE() Flag:03
+setMember??("Kashiwagi Yuki")
+UKN1827(01F4)
+setSpeakerAsPlayer(0000,"Player")
+setDialogue("間違ってたら悪いし<LINEEND>メールを送るのは止めておくか。", B6EA)
+Special : 00 00 00 01 00 00 00 00 00 20 0B
+UKN1427()
+UKN3027(0002)
+Special : 00 00 20 9A 21
+setSpeakerAsPlayer(0000,"Player")
+setDialogue("……なんか違う気がするな。", B6EB)
+playSE() Flag:03
+setMember??("Kashiwagi Yuki")
+UKN1827(01F4)
+setSpeakerAsPlayer(0000,"Player")
+setDialogue("間違ってたら悪いし<LINEEND>メールを送るのは止めておくか。", B6EC)
+Special : 00 00 00 02 00 00 00 00 00 20 0B
+UKN1427()
+UKN3027(0003)
+UKN1927()

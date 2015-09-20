@@ -1,0 +1,46 @@
+UKN0127()
+UKNFFFF8F27()
+UKN0F27()
+setSpeakerAsPlayer(0000,"Player")
+setDialogue("そういえば……<LINEEND>そろそろゆったんの誕生日だな。", EAD6)
+playSE() Flag:03
+UKN2027(0007)
+UKN1B27(002D , 2970 , 0000)
+SetBGImage(8510000)
+UKN0827()
+UKN1827(01F4)
+setSpeakerAsPlayer(0000,"Player")
+setDialogue("何日だっけ？<LINEEND>え～っと……。", EAD7)
+UKN3027(0000)
+setChoice("８月３日", "８月１３日", "８月８日")
+Special : 00 00 20 9A 00 00 20 24 00 00 1F A9 00 00 1F 4A 04 24 05
+setSpeakerAsPlayer(0000,"Player")
+setDialogue("そうだ、８月３日だ！", EAD8)
+setSpeakerAsPlayer(0000,"Player")
+setDialogue("よし、忘れずにおめでとうメールを<LINEEND>送っておかないとな。", EAD9)
+Special : 00 00 00 00 00 00 00 00 00 20 0B
+UKN1127()
+UKN3027(0001)
+Special : 00 00 20 9A 21
+setSpeakerAsPlayer(0000,"Player")
+setDialogue("……なんか違う気がするな。", EADA)
+playSE() Flag:03
+setMember??("Yuka Masuda")
+UKN1827(01F4)
+setSpeakerAsPlayer(0000,"Player")
+setDialogue("間違ってたら悪いし<LINEEND>メールを送るのは止めておくか。", EADB)
+Special : 00 00 00 01 00 00 00 00 00 20 0B
+UKN1427()
+UKN3027(0002)
+Special : 00 00 20 9A 21
+setSpeakerAsPlayer(0000,"Player")
+setDialogue("……なんか違う気がするな。", EADC)
+playSE() Flag:03
+setMember??("Yuka Masuda")
+UKN1827(01F4)
+setSpeakerAsPlayer(0000,"Player")
+setDialogue("間違ってたら悪いし<LINEEND>メールを送るのは止めておくか。", EADD)
+Special : 00 00 00 02 00 00 00 00 00 20 0B
+UKN1427()
+UKN3027(0003)
+UKN1927()

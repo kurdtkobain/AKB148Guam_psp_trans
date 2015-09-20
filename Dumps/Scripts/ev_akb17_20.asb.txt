@@ -1,0 +1,31 @@
+UKN0127()
+UKN5727()
+SetBGImage(1080000)
+SetLocName("街中")
+UKN0527()
+setSpeakerAsPlayer(0000,"Player")
+setDialogue("ん？　なんか走ってくる人がいるぞ？", 569D)
+setSpeakerAsPlayer(0000,"Player")
+setDialogue("さやか？", 569E)
+playSE() Flag:03
+playSE("se162") Flag:00
+UKN1827(07D0)
+setMemberWithUKN("Sayaka Akimoto", 00CD)
+UKN1827(01F4)
+UKN2127(0001)
+setSpeakerWithImage("Sayaka Akimoto", 603)
+setSpeakerAsMemberWithVoice(0000, "Sayaka Akimoto", "17_20_0010_17")
+setDialogue("みーてーたーぞー！", 569F)
+UKN2127(0002)
+setSpeakerWithImage("Sayaka Akimoto", 200)
+setSpeakerAsMemberWithVoice(0000, "Sayaka Akimoto", "17_20_0020_17")
+setDialogue("私もデートがしたーい！", 56A0)
+setMember??("Sayaka Akimoto")
+playSE() Flag:03
+playSE("se161") Flag:00
+UKN1827(07D0)
+setSpeakerAsPlayer(0000,"Player")
+setDialogue("……なんだったんだろう……。", 56A1)
+Special : 00 00 00 00 00 00 00 00 00 20 0B
+UKN1427()
+UKN1927()

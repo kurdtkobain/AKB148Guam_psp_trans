@@ -1,0 +1,1 @@
+setDialogue("サンプル３だよ", FC45)
