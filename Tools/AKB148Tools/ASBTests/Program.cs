@@ -74,18 +74,18 @@ namespace ASBTests
             {
                 case "0000":
                     StringBuilder str = new StringBuilder();
-                    str.Append("Special :");
+                    str.Append("Special:");
                     foreach (byte b in opc.RawBytes)
-                        str.Append(" " + b.ToString("X2"));
+                        str.Append(" 0x" + b.ToString("X2"));
                     return str.ToString();
                 case "4B29":
                     if (opc.paramNum == 3)
                     {
-                        return "setSpeakerAsMemberWithVoice(" + opc.paramList[0].ToString("X4") + ", " + Members.getMemberName(opc.paramList[1]) + ", " + checkForText(opc.paramList[2]) + ")";
+                        return "setSpeakerAsMemberWithVoice(0x" + opc.paramList[0].ToString("X4") + ", " + Members.getMemberName(opc.paramList[1]) + ", " + checkForText(opc.paramList[2]) + ")";
                     }
                     else
                     {
-                        return "setSpeakerAsPlayer(" + opc.paramList[0].ToString("X4") + "," + Members.getMemberName(opc.paramList[1]) + ")";
+                        return "setSpeakerAsPlayer(0x" + opc.paramList[0].ToString("X4") + "," + Members.getMemberName(opc.paramList[1]) + ")";
                     }
 
                 case "0427":
@@ -95,10 +95,10 @@ namespace ASBTests
                     return "SetBGImage(" + opc.paramList[0].ToString() + ")";
 
                 case "0029":
-                    return "setDialogue(" + checkForText(opc.paramList[0]) + ", " + opc.paramList[1].ToString("X4") + ")";
+                    return "setDialogue(" + checkForText(opc.paramList[0]) + ", 0x" + opc.paramList[1].ToString("X4") + ")";
 
                 case "1A27":
-                    return "setMemberWithUKN(" + Members.getMemberName(opc.paramList[0]) + ", " + opc.paramList[1].ToString("X4") + ")";
+                    return "setMemberWithUKN(" + Members.getMemberName(opc.paramList[0]) + ", 0x" + opc.paramList[1].ToString("X4") + ")";
 
                 case "1C27":
                     return "setSpeakerWithImage(" + Members.getMemberName(opc.paramList[0]) + ", " + opc.paramList[1].ToString() + ")";
@@ -113,15 +113,15 @@ namespace ASBTests
                         return "setChoice(" + checkForText(opc.paramList[0]) + ", " + checkForText(opc.paramList[1]) + ")";
                     }
                 case "3227":
-                    return "Zoom??(" + Members.getMemberName(opc.paramList[0]) + ", " + opc.paramList[1] + ", " + opc.paramList[2] + ", " + opc.paramList[3] + ", " + opc.paramList[4] + ")";
+                    return "SetZoom(" + Members.getMemberName(opc.paramList[0]) + ", " + opc.paramList[1] + ", " + opc.paramList[2] + ", " + opc.paramList[3] + ", " + opc.paramList[4] + ")";
 
                 case "1E27":
-                    return "setMember??(" + Members.getMemberName(opc.paramList[0]) + ")";
+                    return "setMemberUKN(" + Members.getMemberName(opc.paramList[0]) + ")";
 
                 case "2927":
                     if (opc.paramList.Count != 0)
                     {
-                        return "CHOICE_UNK(" + opc.paramList[0].ToString("X4") + ")";
+                        return "CHOICE_UNK(0x" + opc.paramList[0].ToString("X4") + ")";
                     }
                     else
                     {
@@ -131,23 +131,24 @@ namespace ASBTests
                 case "2A29":
                     if (opc.paramList.Count != 0)
                     {
-                        return "playSE(" + checkForText(opc.paramList[0]) + ") Flag:" + opc.UKNFlag.ToString("X2");
+                        return "playSE(" + checkForText(opc.paramList[0]) + ") Flag: 0x" + opc.UKNFlag.ToString("X2");
                     }
                     else
                     {
-                        return "playSE() Flag:" + opc.UKNFlag.ToString("X2");
+                        return "playSE() Flag: 0x" + opc.UKNFlag.ToString("X2");
                     }
 
                 default:
                     string tmp = "UKN" + opc.OPCode.ToString("X4") + "(";
                     if (opc.paramNum != 0 && opc.paramList.Count != 0)
                     {
+                        tmp += "0x";
                         for (int i = 0; i < opc.paramNum; i++)
                         {
                             tmp += opc.paramList[i].ToString("X4");
                             if ((i + 1) != opc.paramNum)
                             {
-                                tmp += " , ";
+                                tmp += " , 0x";
                             }
                         }
                     }
