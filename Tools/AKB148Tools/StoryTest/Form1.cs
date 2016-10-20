@@ -48,6 +48,7 @@ namespace StoryTest
             IFilterGraph2 ifg2;
             IMediaControl imc;
             IMediaEvent ime;
+            IBasicAudio iba;
 
             fg = new FilterGraph();
 
@@ -60,9 +61,19 @@ namespace StoryTest
             // Get the IMediaEvent interface from the fg object
             ime = (IMediaEvent)fg;
 
+            // Get the IBasicAudio interface from the fg object
+            iba = (IBasicAudio)fg;
+
             // Build the graph
             hr = ifg2.RenderFile(Script[indexer].audioFilename, null);
             DsError.ThrowExceptionForHR(hr);
+
+            int vol = System.Math.Abs(trackBar1.Value * 100);
+            int negvol = vol * (-1);
+            int finalvol = (-10000) - negvol;
+
+            //Set volume
+            iba.put_Volume(finalvol);
 
             // Run the graph
             hr = imc.Run();
@@ -132,6 +143,11 @@ namespace StoryTest
         private void dataGridView1_CellContentDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             loadASB();
+        }
+
+        private void trackBar1_ValueChanged(object sender, EventArgs e)
+        {
+            label3.Text = "Volume: " + trackBar1.Value.ToString() + "%";
         }
     }
 }
