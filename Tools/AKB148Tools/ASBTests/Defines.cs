@@ -1,4 +1,11 @@
-﻿using System;
+﻿#region copyright
+// <copyright file="Defines.cs" company="Kurdtkobain">
+// Copyright (c) 2015-2017 All Rights Reserved
+// </copyright>
+// <author>Kurdtkobain</author>
+// <date>2015/9/18 6:28:07 AM </date>
+#endregion
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

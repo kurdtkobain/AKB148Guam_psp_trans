@@ -1,4 +1,11 @@
-﻿using System;
+﻿#region copyright
+// <copyright file="Program.cs" company="Kurdtkobain">
+// Copyright (c) 2015-2017 All Rights Reserved
+// </copyright>
+// <author>Kurdtkobain</author>
+// <date>2015/2/24 8:05:37 AM </date>
+#endregion
+using System;
 using System.Windows.Forms;
 
 namespace AKB148GASBEdit

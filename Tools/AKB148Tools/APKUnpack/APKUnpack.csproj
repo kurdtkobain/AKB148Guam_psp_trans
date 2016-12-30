@@ -42,6 +42,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="APKUnpack.licenseheader" />
     <None Include="App.config" />
     <None Include="Readme.md" />
   </ItemGroup>

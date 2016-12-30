@@ -1,4 +1,11 @@
-﻿using System.Reflection;
+﻿#region copyright
+// <copyright file="AssemblyInfo.cs" company="Kurdtkobain">
+// Copyright (c) 2015-2017 All Rights Reserved
+// </copyright>
+// <author>Kurdtkobain</author>
+// <date>2015/2/28 3:45:29 AM </date>
+#endregion
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following

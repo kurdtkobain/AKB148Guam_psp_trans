@@ -1,4 +1,11 @@
-﻿using AKB148GASBLib;
+﻿#region copyright
+// <copyright file="Form1.cs" company="Kurdtkobain">
+// Copyright (c) 2015-2017 All Rights Reserved
+// </copyright>
+// <author>Kurdtkobain</author>
+// <date>2015/9/19 7:03:28 AM </date>
+#endregion
+using AKB148GASBLib;
 using DirectShowLib;
 using System;
 using System.Collections.Generic;
@@ -68,9 +75,8 @@ namespace StoryTest
             hr = ifg2.RenderFile(Script[indexer].audioFilename, null);
             DsError.ThrowExceptionForHR(hr);
 
-            int vol = System.Math.Abs(trackBar1.Value * 100);
-            int negvol = vol * (-1);
-            int finalvol = (-10000) - negvol;
+            int vol = (10000) - System.Math.Abs(trackBar1.Value * 100);
+            int finalvol = vol * (-1);
 
             //Set volume
             iba.put_Volume(finalvol);

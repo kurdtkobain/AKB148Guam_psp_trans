@@ -1,4 +1,11 @@
-﻿using MiscUtil.Conversion;
+﻿#region copyright
+// <copyright file="Program.cs" company="Kurdtkobain">
+// Copyright (c) 2015-2017 All Rights Reserved
+// </copyright>
+// <author>Kurdtkobain</author>
+// <date>2015/2/28 3:45:29 AM </date>
+#endregion
+using MiscUtil.Conversion;
 using MiscUtil.IO;
 using System;
 using System.IO;

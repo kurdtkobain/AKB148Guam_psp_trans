@@ -1,4 +1,11 @@
-﻿using System.Reflection;
+﻿#region copyright
+// <copyright file="AssemblyInfo.cs" company="Kurdtkobain">
+// Copyright (c) 2015-2017 All Rights Reserved
+// </copyright>
+// <author>Kurdtkobain</author>
+// <date>2015/3/4 8:34:12 PM </date>
+#endregion
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 

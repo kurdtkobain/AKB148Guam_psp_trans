@@ -1,4 +1,11 @@
-﻿namespace StoryTest
+﻿#region copyright
+// <copyright file="Form1.Designer.cs" company="Kurdtkobain">
+// Copyright (c) 2015-2017 All Rights Reserved
+// </copyright>
+// <author>Kurdtkobain</author>
+// <date>2015/9/19 7:03:28 AM </date>
+#endregion
+namespace StoryTest
 {
     partial class Form1
     {
@@ -117,7 +124,7 @@
             this.trackBar1.Size = new System.Drawing.Size(262, 45);
             this.trackBar1.TabIndex = 6;
             this.trackBar1.TickStyle = System.Windows.Forms.TickStyle.TopLeft;
-            this.trackBar1.Value = 100;
+            this.trackBar1.Value = 73;
             this.trackBar1.ValueChanged += new System.EventHandler(this.trackBar1_ValueChanged);
             // 
             // label3
@@ -125,9 +132,9 @@
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(198, 521);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(42, 13);
+            this.label3.Size = new System.Drawing.Size(68, 13);
             this.label3.TabIndex = 7;
-            this.label3.Text = "Volume";
+            this.label3.Text = "Volume: 73%";
             // 
             // Form1
             // 

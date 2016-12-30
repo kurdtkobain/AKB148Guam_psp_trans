@@ -1,4 +1,11 @@
-﻿namespace ScriptEditor
+﻿#region copyright
+// <copyright file="Main.Designer.cs" company="Kurdtkobain">
+// Copyright (c) 2015-2017 All Rights Reserved
+// </copyright>
+// <author>Kurdtkobain</author>
+// <date>2015/2/24 8:05:37 AM </date>
+#endregion
+namespace ScriptEditor
 {
     partial class Main
     {
