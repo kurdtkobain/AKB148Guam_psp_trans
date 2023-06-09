@@ -81,19 +81,23 @@ namespace AKB148GASBLib
             Header head = getHeader(inFile);
             int script_offset = head.sOffset;
             int script_size = head.sSize;
-            EndianBinaryReader reader = new EndianBinaryReader(EndianBitConverter.Little, File.Open(inFile, FileMode.Open, FileAccess.Read));
-            reader.BaseStream.Position = script_offset;
-            MemoryStream scriptStream = new MemoryStream(reader.ReadBytes(script_size));
-            reader.Close();
-            scriptStream.Position = offset;
             string output;
-            if (!noParenth)
-                output = "\"" + ReadStringZ(scriptStream) +"\"";
-            else
-                output = ReadStringZ(scriptStream);
-            output = output.Replace(Encoding.UTF8.GetString(new byte[] { 0x0A }), "<LINEEND>");
-            output = output.Replace(Encoding.UTF8.GetString(new byte[] { 0x00 }), "");
-            scriptStream.Close();
+            using (EndianBinaryReader reader = new EndianBinaryReader(EndianBitConverter.Little, File.Open(inFile, FileMode.Open, FileAccess.Read)))
+            {
+                reader.BaseStream.Position = script_offset;
+                using (MemoryStream scriptStream = new MemoryStream(reader.ReadBytes(script_size)))
+                {
+                    reader.Close();
+                    scriptStream.Position = offset;
+                    if (!noParenth)
+                        output = "\"" + ReadStringZ(scriptStream) + "\"";
+                    else
+                        output = ReadStringZ(scriptStream);
+                    output = output.Replace(Encoding.UTF8.GetString(new byte[] { 0x0A }), "<LINEEND>");
+                    output = output.Replace(Encoding.UTF8.GetString(new byte[] { 0x00 }), "");
+                    scriptStream.Close();
+                }
+            }
             return output;
         }
 
@@ -122,17 +126,22 @@ namespace AKB148GASBLib
             Header head = getHeader(inFile);
             int script_offset = head.sOffset;
             int script_size = head.sSize;
-            EndianBinaryReader reader = new EndianBinaryReader(EndianBitConverter.Little, File.Open(inFile, FileMode.Open, FileAccess.Read));
-            reader.BaseStream.Position = script_offset;
-            MemoryStream scriptStream = new MemoryStream(reader.ReadBytes(script_size));
-            reader.Close();
-            while (scriptStream.Position != scriptStream.Length)
+            using (EndianBinaryReader reader = new EndianBinaryReader(EndianBitConverter.Little, File.Open(inFile, FileMode.Open, FileAccess.Read)))
             {
-                dialog d = new dialog();
-                d.offset = scriptStream.Position + script_offset;
-                d.text = ReadStringZ(scriptStream);
-                d.size = Encoding.UTF8.GetBytes(d.text).Length;
-                dlist.Add(d);
+                reader.BaseStream.Position = script_offset;
+                using (MemoryStream scriptStream = new MemoryStream(reader.ReadBytes(script_size)))
+                {
+                    reader.Close();
+                    while (scriptStream.Position != scriptStream.Length)
+                    {
+                        dialog d = new dialog();
+                        d.offset = scriptStream.Position + script_offset;
+                        d.text = ReadStringZ(scriptStream);
+                        d.size = Encoding.UTF8.GetBytes(d.text).Length;
+                        dlist.Add(d);
+                    }
+                    scriptStream.Close();
+                }
             }
             if (format && !eventOnly)
             {
@@ -211,17 +220,22 @@ namespace AKB148GASBLib
             Header head = getHeader(inFile);
             int script_offset = head.sOffset;
             int script_size = head.sSize;
-            EndianBinaryReader reader = new EndianBinaryReader(EndianBitConverter.Little, File.Open(inFile, FileMode.Open, FileAccess.Read));
-            reader.BaseStream.Position = script_offset;
-            MemoryStream scriptStream = new MemoryStream(reader.ReadBytes(script_size));
-            reader.Close();
-            while (scriptStream.Position != scriptStream.Length)
+            using (EndianBinaryReader reader = new EndianBinaryReader(EndianBitConverter.Little, File.Open(inFile, FileMode.Open, FileAccess.Read)))
             {
-                dialog d = new dialog();
-                d.offset = scriptStream.Position;// + script_offset;
-                d.text = ReadStringZ(scriptStream);
-                d.size = Encoding.UTF8.GetBytes(d.text).Length;
-                dlist.Add(d);
+                reader.BaseStream.Position = script_offset;
+                using (MemoryStream scriptStream = new MemoryStream(reader.ReadBytes(script_size)))
+                {
+                    reader.Close();
+                    while (scriptStream.Position != scriptStream.Length)
+                    {
+                        dialog d = new dialog();
+                        d.offset = scriptStream.Position;// + script_offset;
+                        d.text = ReadStringZ(scriptStream);
+                        d.size = Encoding.UTF8.GetBytes(d.text).Length;
+                        dlist.Add(d);
+                    }
+                    scriptStream.Close();
+                }
             }
             if (format)
             {
@@ -314,26 +328,32 @@ namespace AKB148GASBLib
 
         public static List<ScriptData> getScript(string inFile)
         {
-            Header head = getHeader(inFile);
+            //Header head = getHeader(inFile);
             List<PointerData> pointD = getPointerData(inFile);
             Array.Reverse(pointD[pointD.Count -2].Data);
-            MemoryStream pDataStream = new MemoryStream(pointD[pointD.Count - 2].Data);
-            EndianBinaryReader R = new EndianBinaryReader(EndianBitConverter.Big, pDataStream);
             List<ScriptData> ops = new List<ScriptData>();
-            parseScript(R, ops, pointD[pointD.Count - 2].Size);
-            R.Close();
-            ops.Reverse();
+            using (MemoryStream pDataStream = new MemoryStream(pointD[pointD.Count - 2].Data))
+            {
+                using (EndianBinaryReader R = new EndianBinaryReader(EndianBitConverter.Big, pDataStream))
+                {
+                    parseScript(R, ops, pointD[pointD.Count - 2].Size);
+                    R.Close();
+                }
+                ops.Reverse();
+            }
             return ops;
 
         }
 
         public static byte[] getScriptRaw(string inFile)
         {
-            Header head = getHeader(inFile);
+            //Header head = getHeader(inFile);
             List<PointerData> pointD = getPointerData(inFile);
             Array.Reverse(pointD[pointD.Count - 2].Data);
-            MemoryStream pDataStream = new MemoryStream(pointD[pointD.Count - 2].Data);
-            return pDataStream.ToArray();
+            using (MemoryStream pDataStream = new MemoryStream(pointD[pointD.Count - 2].Data))
+            {
+                return pDataStream.ToArray();
+            }
 
         }
 
@@ -439,53 +459,57 @@ namespace AKB148GASBLib
         public static Header getHeader(string inFile)
         {
             Header head = new Header();
-            EndianBinaryReader reader = new EndianBinaryReader(EndianBitConverter.Little, File.Open(inFile, FileMode.Open, FileAccess.Read));
-            head.ZERO = reader.ReadInt32(); //always 0x00000000
-            head.fileName = Encoding.UTF8.GetString(reader.ReadBytes(15));
-            head.ZERO2 =reader.ReadByte(); //0x00
-            head.ZEROS = reader.ReadBytes(16); //always 0's
-            head.UKN1 = reader.ReadInt32(); //always 0x44000000
-            head.UKN2 = reader.ReadInt32(); //always 0x99000000
-            head.nOffset = reader.ReadInt32(); //always 0x380C0000
-            head.nSize = reader.ReadInt32();
-            head.sOffset = reader.ReadInt32();
-            head.sSize = reader.ReadInt32();
-            head.sEOF = reader.ReadInt32();
-            head.UKN3 = reader.ReadInt32(); //always 0x09000000
-            head.STARTOFF = reader.BaseStream.Position;
-            reader.Close();
+            using (EndianBinaryReader reader = new EndianBinaryReader(EndianBitConverter.Little, File.Open(inFile, FileMode.Open, FileAccess.Read)))
+            {
+                head.ZERO = reader.ReadInt32(); //always 0x00000000
+                head.fileName = Encoding.UTF8.GetString(reader.ReadBytes(15));
+                head.ZERO2 = reader.ReadByte(); //0x00
+                head.ZEROS = reader.ReadBytes(16); //always 0's
+                head.UKN1 = reader.ReadInt32(); //always 0x44000000
+                head.UKN2 = reader.ReadInt32(); //always 0x99000000
+                head.nOffset = reader.ReadInt32(); //always 0x380C0000
+                head.nSize = reader.ReadInt32();
+                head.sOffset = reader.ReadInt32();
+                head.sSize = reader.ReadInt32();
+                head.sEOF = reader.ReadInt32();
+                head.UKN3 = reader.ReadInt32(); //always 0x09000000
+                head.STARTOFF = reader.BaseStream.Position;
+                reader.Close();
+            }
             return head;
         }
 
         public static List<PointerData> getPointerData(string inFile)
         {
             Header head = getHeader(inFile);
-            EndianBinaryReader reader = new EndianBinaryReader(EndianBitConverter.Little, File.Open(inFile, FileMode.Open, FileAccess.Read));
-            reader.BaseStream.Position = head.STARTOFF;
-            List<PointerTOC> tst = new List<PointerTOC>();
-            while (reader.BaseStream.Position < head.nOffset)
-            {
-                PointerTOC list = new PointerTOC();
-                list.sOffset = reader.ReadInt32();
-                list.UKN1 = reader.ReadInt32();
-                list.UKN2 = reader.ReadInt32();
-                list.pOffset = reader.ReadInt32();
-                list.pSize = reader.ReadInt32();
-                tst.Add(list);
-
-            }
-            long tmpoff = reader.BaseStream.Position;
             List<PointerData> pointD = new List<PointerData>();
-            foreach (PointerTOC p in tst)
+            using (EndianBinaryReader reader = new EndianBinaryReader(EndianBitConverter.Little, File.Open(inFile, FileMode.Open, FileAccess.Read)))
             {
-                PointerData pData = new PointerData();
-                pData.Offset = p.pOffset + head.nOffset;
-                reader.BaseStream.Position = pData.Offset;
-                pData.Size = p.pSize;
-                pData.Data = reader.ReadBytes(pData.Size);
-                pointD.Add(pData);
+                reader.BaseStream.Position = head.STARTOFF;
+                List<PointerTOC> tst = new List<PointerTOC>();
+                while (reader.BaseStream.Position < head.nOffset)
+                {
+                    PointerTOC list = new PointerTOC();
+                    list.sOffset = reader.ReadInt32();
+                    list.UKN1 = reader.ReadInt32();
+                    list.UKN2 = reader.ReadInt32();
+                    list.pOffset = reader.ReadInt32();
+                    list.pSize = reader.ReadInt32();
+                    tst.Add(list);
+
+                }
+                long tmpoff = reader.BaseStream.Position;
+                foreach (PointerTOC p in tst)
+                {
+                    PointerData pData = new PointerData();
+                    pData.Offset = p.pOffset + head.nOffset;
+                    reader.BaseStream.Position = pData.Offset;
+                    pData.Size = p.pSize;
+                    pData.Data = reader.ReadBytes(pData.Size);
+                    pointD.Add(pData);
+                }
+                reader.Close();
             }
-            reader.Close();
             return pointD;
         }
         }
