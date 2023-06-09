@@ -16,7 +16,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace APKUnpack
+namespace APKUnpackPS3
 {
     internal class Program
     {
