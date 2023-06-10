@@ -32,6 +32,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2dcSticher", "2dcSticher\2d
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "APKUnpackPS3", "APKUnpackPS3\APKUnpackPS3.csproj", "{FCAF63B1-4F40-4B65-8F36-9CA32A07607C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StoryTestPS3", "StoryTest\StoryTestPS3.csproj", "{67ECF58F-6024-4047-93BC-A86B3F447C54}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -86,6 +88,10 @@ Global
 		{FCAF63B1-4F40-4B65-8F36-9CA32A07607C}.Debug|x64.Build.0 = Debug|x64
 		{FCAF63B1-4F40-4B65-8F36-9CA32A07607C}.Release|x64.ActiveCfg = Release|x64
 		{FCAF63B1-4F40-4B65-8F36-9CA32A07607C}.Release|x64.Build.0 = Release|x64
+		{67ECF58F-6024-4047-93BC-A86B3F447C54}.Debug|x64.ActiveCfg = Debug|x64
+		{67ECF58F-6024-4047-93BC-A86B3F447C54}.Debug|x64.Build.0 = Debug|x64
+		{67ECF58F-6024-4047-93BC-A86B3F447C54}.Release|x64.ActiveCfg = Release|x64
+		{67ECF58F-6024-4047-93BC-A86B3F447C54}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

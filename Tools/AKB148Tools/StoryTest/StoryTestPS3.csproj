@@ -1,0 +1,186 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="..\packages\Vortice.XAudio2.2.4.2\build\Vortice.XAudio2.props" Condition="Exists('..\packages\Vortice.XAudio2.2.4.2\build\Vortice.XAudio2.props')" />
+  <Import Project="..\packages\Vortice.MediaFoundation.2.4.2\build\Vortice.MediaFoundation.props" Condition="Exists('..\packages\Vortice.MediaFoundation.2.4.2\build\Vortice.MediaFoundation.props')" />
+  <Import Project="..\packages\Vortice.DirectComposition.2.4.2\build\Vortice.DirectComposition.props" Condition="Exists('..\packages\Vortice.DirectComposition.2.4.2\build\Vortice.DirectComposition.props')" />
+  <Import Project="..\packages\Vortice.Direct3D11.2.4.2\build\Vortice.Direct3D11.props" Condition="Exists('..\packages\Vortice.Direct3D11.2.4.2\build\Vortice.Direct3D11.props')" />
+  <Import Project="..\packages\Vortice.Direct2D1.2.4.2\build\Vortice.Direct2D1.props" Condition="Exists('..\packages\Vortice.Direct2D1.2.4.2\build\Vortice.Direct2D1.props')" />
+  <Import Project="..\packages\Vortice.DXGI.2.4.2\build\Vortice.DXGI.props" Condition="Exists('..\packages\Vortice.DXGI.2.4.2\build\Vortice.DXGI.props')" />
+  <Import Project="..\packages\Vortice.D3DCompiler.2.4.2\build\Vortice.D3DCompiler.props" Condition="Exists('..\packages\Vortice.D3DCompiler.2.4.2\build\Vortice.D3DCompiler.props')" />
+  <Import Project="..\packages\Vortice.DirectX.2.4.2\build\Vortice.DirectX.props" Condition="Exists('..\packages\Vortice.DirectX.2.4.2\build\Vortice.DirectX.props')" />
+  <Import Project="..\packages\SharpGen.Runtime.COM.2.0.0-beta.13\build\SharpGen.Runtime.COM.props" Condition="Exists('..\packages\SharpGen.Runtime.COM.2.0.0-beta.13\build\SharpGen.Runtime.COM.props')" />
+  <Import Project="..\packages\SharpGen.Runtime.2.0.0-beta.13\build\SharpGen.Runtime.props" Condition="Exists('..\packages\SharpGen.Runtime.2.0.0-beta.13\build\SharpGen.Runtime.props')" />
+   
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{67ECF58F-6024-4047-93BC-A86B3F447C54}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>StoryTest</RootNamespace>
+    <AssemblyName>StoryTestPS3</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\bin\x64\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;PS3</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>..\bin\x64\Release\</OutputPath>
+    <DefineConstants>
+    </DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+  </PropertyGroup>
+  <ItemGroup>
+	<Reference Include="FFmpeg.AutoGen, Version=5.1.2.1, Culture=neutral, PublicKeyToken=9b7632533a381715, processorArchitecture=MSIL">
+      <HintPath>..\packages\FFmpeg.AutoGen.5.1.2.1\lib\net45\FFmpeg.AutoGen.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FlyleafLib, Version=3.7.20.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\FlyleafLib.3.7.20\lib\net472\FlyleafLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.HashCode, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.HashCode.1.1.1\lib\net461\Microsoft.Bcl.HashCode.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="SharpGen.Runtime, Version=2.0.0.0, Culture=neutral, PublicKeyToken=a7c0d43f556c6402, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpGen.Runtime.2.0.0-beta.13\lib\net471\SharpGen.Runtime.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="SharpGen.Runtime.COM, Version=2.0.0.0, Culture=neutral, PublicKeyToken=a7c0d43f556c6402, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpGen.Runtime.COM.2.0.0-beta.13\lib\net471\SharpGen.Runtime.COM.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ASB.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ASB.Designer.cs">
+      <DependentUpon>ASB.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Defines.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="ASB.resx">
+      <DependentUpon>ASB.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <None Include="StoryTest.licenseheader" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="FFmpeg\avcodec-59.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FFmpeg\avdevice-59.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FFmpeg\avfilter-8.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FFmpeg\avformat-59.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FFmpeg\avutil-57.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FFmpeg\postproc-56.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FFmpeg\swresample-4.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FFmpeg\swscale-6.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AKB148GASBLib\AKB148GASBLib.csproj">
+      <Project>{d6cfeef2-5af3-4908-b5c7-67b62b87ed7c}</Project>
+      <Name>AKB148GASBLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EndianBinaryReader\EndianBinaryReader.csproj">
+      <Project>{4e6e3e08-0cf9-4548-bf0f-b10f793b3798}</Project>
+      <Name>EndianBinaryReader</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\PolySharp.1.10.0\build\PolySharp.targets" Condition="Exists('..\packages\PolySharp.1.10.0\build\PolySharp.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\PolySharp.1.10.0\build\PolySharp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\PolySharp.1.10.0\build\PolySharp.targets'))" />
+    <Error Condition="!Exists('..\packages\SharpGen.Runtime.2.0.0-beta.13\build\SharpGen.Runtime.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SharpGen.Runtime.2.0.0-beta.13\build\SharpGen.Runtime.props'))" />
+    <Error Condition="!Exists('..\packages\SharpGen.Runtime.COM.2.0.0-beta.13\build\SharpGen.Runtime.COM.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SharpGen.Runtime.COM.2.0.0-beta.13\build\SharpGen.Runtime.COM.props'))" />
+    <Error Condition="!Exists('..\packages\Vortice.DirectX.2.4.2\build\Vortice.DirectX.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Vortice.DirectX.2.4.2\build\Vortice.DirectX.props'))" />
+    <Error Condition="!Exists('..\packages\Vortice.D3DCompiler.2.4.2\build\Vortice.D3DCompiler.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Vortice.D3DCompiler.2.4.2\build\Vortice.D3DCompiler.props'))" />
+    <Error Condition="!Exists('..\packages\Vortice.DXGI.2.4.2\build\Vortice.DXGI.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Vortice.DXGI.2.4.2\build\Vortice.DXGI.props'))" />
+    <Error Condition="!Exists('..\packages\Vortice.Direct2D1.2.4.2\build\Vortice.Direct2D1.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Vortice.Direct2D1.2.4.2\build\Vortice.Direct2D1.props'))" />
+    <Error Condition="!Exists('..\packages\Vortice.Direct3D11.2.4.2\build\Vortice.Direct3D11.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Vortice.Direct3D11.2.4.2\build\Vortice.Direct3D11.props'))" />
+    <Error Condition="!Exists('..\packages\Vortice.DirectComposition.2.4.2\build\Vortice.DirectComposition.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Vortice.DirectComposition.2.4.2\build\Vortice.DirectComposition.props'))" />
+    <Error Condition="!Exists('..\packages\Vortice.MediaFoundation.2.4.2\build\Vortice.MediaFoundation.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Vortice.MediaFoundation.2.4.2\build\Vortice.MediaFoundation.props'))" />
+    <Error Condition="!Exists('..\packages\Vortice.XAudio2.2.4.2\build\Vortice.XAudio2.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Vortice.XAudio2.2.4.2\build\Vortice.XAudio2.props'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
