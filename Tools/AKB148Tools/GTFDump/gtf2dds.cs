@@ -214,13 +214,13 @@ namespace GTFDump
             else if (is_dxt)
             {
                 ushort color_depth = gtfutil.gtfGetDepth(raw_format);
-                ddsh.pitchOrLinearSize = (uint)(((texture.width + 3) / 4) * ((texture.height + 3) / 4) * color_depth);
+                ddsh.pitchOrLinearSize = ((texture.width + 3) / 4 * ((texture.height + 3) / 4) * color_depth);
 
                 ddsh.flags |= DDSD_LINEARSIZE;
             }
             else if (bLinearSize)
             {
-                uint pitch = gtfutil.gtfGetPitch(raw_format, texture.width);
+                int pitch = gtfutil.gtfGetPitch(raw_format, texture.width);
                 ddsh.pitchOrLinearSize = texture.height * pitch;
 
                 ddsh.flags |= DDSD_LINEARSIZE;

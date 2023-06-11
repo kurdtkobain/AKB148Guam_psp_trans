@@ -92,25 +92,25 @@ namespace GTFDump
         public struct layout_t
         {
 
-            public uint dds_offset;
-            public uint dds_size;
-            public uint gtf_linear_offset;
-            public uint gtf_linear_size;
-            public uint gtf_swizzle_offset;
-            public uint gtf_swizzle_size;
+            public int dds_offset;
+            public int dds_size;
+            public int gtf_linear_offset;
+            public int gtf_linear_size;
+            public int gtf_swizzle_offset;
+            public int gtf_swizzle_size;
 
             public ushort width;
             public ushort height;
             public ushort depth;
             public ushort color_depth;
-            public uint pitch;
+            public int pitch;
 
-            public uint dds_pitch;
+            public int dds_pitch;
             public ushort dds_depth;
             public bool dds_expand;
         }
 
-        public static uint utilGetAlign(uint size, uint alignment)
+        public static int utilGetAlign(int size, int alignment)
         {
             return (size + alignment - 1) & ~(alignment - 1);
         }
@@ -135,12 +135,12 @@ namespace GTFDump
             return retf;
         }
 
-        public static uint my_min(uint a, uint b)
+        public static int my_min(int a, int b)
         {
             return (a < b ? a : b);
         }
 
-        public static uint my_max(uint a, uint b)
+        public static int my_max(int a, int b)
         {
             return (a > b ? a : b);
         }
@@ -152,10 +152,10 @@ namespace GTFDump
 
         public static byte utilGetMipmapSize(ushort width, ushort height, ushort depth)
         {
-            return (byte)(my_max(my_max((uint)log2d(width), (uint)log2d(height)), (uint)log2d(depth)) + 1);
+            return (byte)(my_max(my_max(log2d(width), log2d(height)), log2d(depth)) + 1);
         }
 
-        public static byte utilCountBit(uint bits)
+        public static byte utilCountBit(int bits)
         {
             byte ret = 0;
 
@@ -166,10 +166,10 @@ namespace GTFDump
             return ret;
         }
 
-        public static void memmove_with_invert_endian16(ref byte[] dest, uint destoff, ref byte[] src, uint srcoff, uint size)
+        public static void memmove_with_invert_endian16(ref byte[] dest, int destoff, ref byte[] src, int srcoff, int size)
         {
-            uint inptr16 = srcoff;
-            uint outptr16 = destoff;
+            int inptr16 = srcoff;
+            int outptr16 = destoff;
 
             for (uint i = 0; i < size / 2; ++i)
             {
@@ -181,15 +181,15 @@ namespace GTFDump
             }
             if (Convert.ToBoolean(size % 2))
             {
-                Buffer.BlockCopy(src, (int)inptr16, dest, (int)outptr16, (int)(size % 2));
+                Buffer.BlockCopy(src, inptr16, dest, outptr16, (size % 2));
                 //memmove(outptr16, inptr16, size % 2);
             }
         }
 
-        public static void memmove_with_invert_endian32(ref byte[] dest, uint destoff, ref byte[] src, uint srcoff, uint size)
+        public static void memmove_with_invert_endian32(ref byte[] dest, int destoff, ref byte[] src, int srcoff, int size)
         {
-            uint inptr32 = srcoff;
-            uint outptr32 = destoff;
+            int inptr32 = srcoff;
+            int outptr32 = destoff;
 
             for (uint i = 0; i < size / 4; ++i)
             {
@@ -203,35 +203,35 @@ namespace GTFDump
             }
             if (Convert.ToBoolean(size % 4))
             {
-                Buffer.BlockCopy(src, (int)inptr32, dest, (int)outptr32, (int)(size % 4));
+                Buffer.BlockCopy(src, inptr32, dest, outptr32, (size % 4));
                 //memmove(outptr32, inptr32, size % 4);
             }
         }
 
-        public static uint utilToSwizzle(uint x, uint y, uint z, uint log2_width, uint log2_height, uint log2_depth)
+        public static int utilToSwizzle(int x, int y, int z, int log2_width, int log2_height, int log2_depth)
         {
-            uint offset = 0;
+            int offset = 0;
 
-            uint t = 0;
+            int t = 0;
             while (log2_width != 0 | log2_height != 0 | log2_depth != 0)
             {
                 if (log2_width != 0)
                 {
-                    offset |= (x & 0x01) << (int)t;
+                    offset |= (x & 0x01) << t;
                     x >>= 1;
                     ++t;
                     --log2_width;
                 }
                 if (log2_height != 0)
                 {
-                    offset |= (y & 0x01) << (int)t;
+                    offset |= (y & 0x01) << t;
                     y >>= 1;
                     ++t;
                     --log2_height;
                 }
                 if (log2_depth != 0)
                 {
-                    offset |= (z & 0x01) << (int)t;
+                    offset |= (z & 0x01) << t;
                     z >>= 1;
                     ++t;
                     --log2_depth;

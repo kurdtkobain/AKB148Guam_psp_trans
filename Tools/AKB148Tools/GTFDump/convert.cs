@@ -8,20 +8,20 @@ namespace GTFDump
     internal class convert
     {
 
-        static void convertMoveMemory(ref byte[] gtf, uint gtfoff, ref byte[] dds, uint ddsoff, uint size, bool bDds2Gtf)
+        static void convertMoveMemory(ref byte[] gtf, int gtfoff, ref byte[] dds, int ddsoff, int size, bool bDds2Gtf)
         {
 
             if (bDds2Gtf)
             {
-                Buffer.BlockCopy(gtf, (int)gtfoff, dds, (int)ddsoff, (int)size);
+                Buffer.BlockCopy(gtf, gtfoff, dds, ddsoff, size);
             }
             else
             {
-                Buffer.BlockCopy(dds, (int)ddsoff, gtf, (int)gtfoff, (int)size);
+                Buffer.BlockCopy(dds, ddsoff, gtf, gtfoff, size);
             }
         }
 
-        static void convertMoveMemoryWithInvertEndian16(ref byte[] gtf, uint gtfoff, ref byte[] dds, uint ddsoff, uint size, bool bDds2Gtf)
+        static void convertMoveMemoryWithInvertEndian16(ref byte[] gtf, int gtfoff, ref byte[] dds, int ddsoff, int size, bool bDds2Gtf)
         {
             if (bDds2Gtf)
             {
@@ -33,7 +33,7 @@ namespace GTFDump
             }
         }
 
-        static void convertMoveMemoryWithInvertEndian32(ref byte[] gtf, uint gtfoff, ref byte[] dds, uint ddsoff, uint size, bool bDds2Gtf)
+        static void convertMoveMemoryWithInvertEndian32(ref byte[] gtf, int gtfoff, ref byte[] dds, int ddsoff, int size, bool bDds2Gtf)
         {
             if (bDds2Gtf)
             {
@@ -45,14 +45,14 @@ namespace GTFDump
             }
         }
 
-        const uint CELL_GTFCONV_ENDIAN_NOINVERT = 0;
-        const uint CELL_GTFCONV_ENDIAN_INVERT32 = 1;
-        const uint CELL_GTFCONV_ENDIAN_INVERT16 = 2;
-        const uint CELL_GTFCONV_ENDIAN_INVERT32_EVEN = 3;
+        const int CELL_GTFCONV_ENDIAN_NOINVERT = 0;
+        const int CELL_GTFCONV_ENDIAN_INVERT32 = 1;
+        const int CELL_GTFCONV_ENDIAN_INVERT16 = 2;
+        const int CELL_GTFCONV_ENDIAN_INVERT32_EVEN = 3;
 
-        static uint getInvertFlag(CellGcmTexture tex)
+        static int getInvertFlag(CellGcmTexture tex)
         {
-            uint invert_flag = CELL_GTFCONV_ENDIAN_INVERT32;
+            int invert_flag = CELL_GTFCONV_ENDIAN_INVERT32;
 
             byte raw_format = gtfutil.gtfGetRawFormat(tex.format);
             bool is_dxt = gtfutil.gtfIsDxtn(raw_format);
@@ -108,7 +108,7 @@ namespace GTFDump
             ushort width = tex.width;
             ushort height = tex.height;
             ushort depth = tex.depth;
-            uint gtf_pitch = tex.pitch;
+            int gtf_pitch = tex.pitch;
             byte cube = 1;
             if (tex.cubemap == CELL_GCM_TRUE)
             {
@@ -136,11 +136,11 @@ namespace GTFDump
                 dds_color_depth = 2;
             }
 
-            var layoff = 0;
+            int layoff = 0;
 
             layout_t latest = new layout_t();
             // cubemap
-            for (uint n = 0; n < cube; ++n)
+            for (int n = 0; n < cube; ++n)
             {
                 bool new_face = true;
                 ushort w = width;
@@ -164,16 +164,16 @@ namespace GTFDump
                     if (is_dxt)
                     {
                         // dxtn
-                        layout.dds_size = (uint)(((w + 3) / 4) * ((h + 3) / 4) * color_depth);
+                        layout.dds_size = (w + 3) / 4 * ((h + 3) / 4) * color_depth;
                     }
                     else if (is_comp)
                     {
                         // B8R8_G8R8, R8B8_R8G8
-                        layout.dds_size = (uint)(((w + 1) / 2) * h * 4);
+                        layout.dds_size = (w + 1) / 2 * h * 4;
                     }
                     else
                     {
-                        layout.dds_size = (uint)(w * h * color_depth);
+                        layout.dds_size = w * h * color_depth;
                     }
 
                     // swizzle gtf size
@@ -181,7 +181,7 @@ namespace GTFDump
 
                     if (dds_color_depth != 0)
                     {
-                        layout.dds_pitch = (uint)(w * dds_color_depth);
+                        layout.dds_pitch = w * dds_color_depth;
                         layout.dds_size = layout.dds_pitch * h;
                     }
 
@@ -189,7 +189,7 @@ namespace GTFDump
                     if (is_dxt)
                     {
                         // not power of 2 dxtn
-                        layout.gtf_linear_size = (uint)(((h + 3) / 4) * gtf_pitch);
+                        layout.gtf_linear_size = ((h + 3) / 4) * gtf_pitch;
                     }
                     else
                     {
@@ -210,7 +210,7 @@ namespace GTFDump
                     if (is_cube && new_face)
                     {
                         // when swizzle cubemap, each face must be aligned on a 128-byte boundary
-                        layout.gtf_swizzle_offset = utils.utilGetAlign(layout.gtf_swizzle_offset, 128);
+                        layout.gtf_swizzle_offset = utilGetAlign(layout.gtf_swizzle_offset, 128);
                         new_face = false;
                     }
                     layout.gtf_linear_offset = latest.gtf_linear_offset + latest.gtf_linear_size;
@@ -253,7 +253,7 @@ namespace GTFDump
         }
 
         
-         public static bool convertBufferByLayout(ref byte[] gtf_image, ref byte[] dds_image, ref layout_t[] playout, uint layout_num, CellGcmTexture tex, bool bDds2Gtf)
+         public static bool convertBufferByLayout(ref byte[] gtf_image, ref byte[] dds_image, ref layout_t[] playout, int layout_num, CellGcmTexture tex, bool bDds2Gtf)
         {
             bool is_swizzle = gtfutil.gtfIsSwizzle(tex.format);
 
@@ -261,7 +261,7 @@ namespace GTFDump
             bool is_dxt = gtfutil.gtfIsDxtn(raw_format);
 
             Console.Write("  [Convert Info]\n");
-            for (uint i = 0; i < layout_num; ++i)
+            for (int i = 0; i < layout_num; ++i)
             {
                 layout_t layout = playout[i];
 
@@ -272,25 +272,25 @@ namespace GTFDump
                     // dxtn format
 
                     // get offsets
-                    uint ddsoff = layout.dds_offset;
-                    uint gtfoff = layout.gtf_linear_offset;
+                    int ddsoff = layout.dds_offset;
+                    int gtfoff = layout.gtf_linear_offset;
                     if (is_swizzle)
                     {
                         gtfoff = layout.gtf_swizzle_offset;
                     }
 
-                    uint block_size = 16;
+                    int block_size = 16;
                     if (raw_format == CELL_GCM_TEXTURE_COMPRESSED_DXT1)
                     {
                         block_size = 8;
                     }
 
-                    uint block_width = ((uint)((layout.width + 3) / 4));
-                    uint block_height = ((uint)((layout.height + 3) / 4));
-                    uint block_depth = ((uint)((layout.depth + 3) / 4));
-                    uint block_pitch = block_width * block_size;
+                    int block_width = (layout.width + 3) / 4;
+                    int block_height = (layout.height + 3) / 4;
+                    int block_depth = (layout.depth + 3) / 4;
+                    int block_pitch = block_width * block_size;
 
-                    uint image_size = block_width * block_height * block_size;
+                    int image_size = block_width * block_height * block_size;
 
                     if (is_swizzle)
                     {
@@ -304,13 +304,13 @@ namespace GTFDump
                                 {
                                     for (int x = 0; x < block_width; ++x)
                                     {
-                                        uint depth_block_num = (uint)(layout.depth % 4);
+                                        int depth_block_num = (layout.depth % 4);
                                         if (depth_block_num == 0) depth_block_num = 4;
 
                                         for (int d_scan = 0; d_scan < depth_block_num; ++d_scan)
                                         {
-                                            uint ddsptr2 = (uint)(ddsoff + image_size * (z * 4 + d_scan));
-                                            ddsptr2 += (uint)(block_size * (x + y * block_width));
+                                            int ddsptr2 = (ddsoff + image_size * (z * 4 + d_scan));
+                                            ddsptr2 += (block_size * (x + y * block_width));
 
                                             convertMoveMemory(ref gtf_image, gtfoff, ref dds_image, ddsptr2, block_size, bDds2Gtf);
                                             gtfoff += block_size;
@@ -328,12 +328,12 @@ namespace GTFDump
                     else
                     {
                         // not powor of 2 dxtn
-                        uint dxt_pitch = gtfutil.gtfGetPitch(raw_format, tex.width);
+                        int dxt_pitch = gtfutil.gtfGetPitch(raw_format, tex.width);
                         for (int d = 0; d < layout.depth; ++d)
                         {
-                            for (uint block_line = 0; block_line < block_height; ++block_line)
+                            for (int block_line = 0; block_line < block_height; ++block_line)
                             {
-                                convertMoveMemory(ref gtf_image, (uint)(gtfoff + dxt_pitch * block_height * d + dxt_pitch * block_line), ref dds_image, (uint)(ddsoff + image_size * d + block_pitch * block_line), block_pitch, bDds2Gtf);
+                                convertMoveMemory(ref gtf_image, gtfoff + dxt_pitch * block_height * d + dxt_pitch * block_line, ref dds_image, ddsoff + image_size * d + block_pitch * block_line, block_pitch, bDds2Gtf);
                             }
                         }
                     }
@@ -342,7 +342,7 @@ namespace GTFDump
                 {
                     // not dxtn format
 
-                    uint invert_flag = getInvertFlag(tex);
+                    int invert_flag = getInvertFlag(tex);
 
                     if (is_swizzle)
                     {
@@ -364,13 +364,13 @@ namespace GTFDump
                     if (raw_format == CELL_GCM_TEXTURE_COMPRESSED_B8R8_G8R8_RAW ||
                         raw_format == CELL_GCM_TEXTURE_COMPRESSED_R8B8_R8G8_RAW)
                     {
-                        layout.width = (ushort)(((layout.width + 1) / 2) * 2);
+                        layout.width = (ushort)((layout.width + 1) / 2 * 2);
                     }
 
                     if (!layout.dds_expand)
                     {
                         layout.dds_depth = layout.color_depth;
-                        layout.dds_pitch = (uint)(layout.width * layout.dds_depth);
+                        layout.dds_pitch = layout.width * layout.dds_depth;
                     }
 
                     for (int d = 0; d < layout.depth; ++d)
@@ -386,7 +386,7 @@ namespace GTFDump
                                 var gtfptr = layout.gtf_linear_offset + d * layout.height * layout.pitch + line * layout.pitch + x * layout.color_depth;
                                 if (is_swizzle)
                                 {
-                                    gtfptr = layout.gtf_swizzle_offset + utils.utilToSwizzle((uint)x, (uint)line, (uint)d, (uint)utils.log2d(layout.width), (uint)utils.log2d(layout.height), (uint)utils.log2d(layout.depth)) * layout.color_depth;
+                                    gtfptr = layout.gtf_swizzle_offset + utilToSwizzle(x, line, d, log2d(layout.width), log2d(layout.height), log2d(layout.depth)) * layout.color_depth;
                                 }
 
                                 if (bDds2Gtf && layout.dds_expand)
@@ -418,7 +418,7 @@ namespace GTFDump
                                 else if (invert_flag == CELL_GTFCONV_ENDIAN_INVERT16)
                                 {
                                     // 16bit
-                                    convertMoveMemoryWithInvertEndian16(ref gtf_image, (uint)gtfptr, ref dds_image, (uint)ddsptr, layout.color_depth, bDds2Gtf);
+                                    convertMoveMemoryWithInvertEndian16(ref gtf_image, gtfptr, ref dds_image, ddsptr, layout.color_depth, bDds2Gtf);
                                 }
                                 else if (invert_flag == CELL_GTFCONV_ENDIAN_INVERT32_EVEN)
                                 {
@@ -426,13 +426,13 @@ namespace GTFDump
                                     if ((x & 0x01) == 0)
                                     {
                                         // even pixel
-                                        convertMoveMemoryWithInvertEndian32(ref gtf_image, (uint)gtfptr,ref dds_image, (uint)ddsptr, 4, bDds2Gtf);
+                                        convertMoveMemoryWithInvertEndian32(ref gtf_image, gtfptr, ref dds_image, ddsptr, 4, bDds2Gtf);
                                     }
                                 }
                                 else if (invert_flag == CELL_GTFCONV_ENDIAN_INVERT32)
                                 {
                                     // 32bit
-                                    convertMoveMemoryWithInvertEndian32(ref gtf_image, (uint)gtfptr, ref dds_image, (uint)ddsptr, layout.color_depth, bDds2Gtf);
+                                    convertMoveMemoryWithInvertEndian32(ref gtf_image, gtfptr, ref dds_image, ddsptr, layout.color_depth, bDds2Gtf);
                                 }
                             }
                         }

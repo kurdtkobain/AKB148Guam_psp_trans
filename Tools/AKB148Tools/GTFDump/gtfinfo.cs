@@ -5,9 +5,9 @@
         public struct CellGtfFileHeader
         {
 
-            public uint version;      // Version (Correspond to dds2gtf converter version)
-            public uint size;         // Total size of Texture. (Excluding size of header & attribute)
-            public uint numTexture;   // Number of textures in this file.
+            public int version;      // Version (Correspond to dds2gtf converter version)
+            public int size;         // Total size of Texture. (Excluding size of header & attribute)
+            public int numTexture;   // Number of textures in this file.
 
         }
 
@@ -17,21 +17,21 @@
             public byte mipmap;
             public byte dimension;
             public byte cubemap;
-            public uint remap;
+            public int remap;
             public ushort width;
             public ushort height;
             public ushort depth;
             public byte location;
             public byte _padding;
-            public uint pitch;
-            public uint offset;
+            public int pitch;
+            public int offset;
         }
 
         public struct CellGtfTextureAttribute
         {
-            public uint id;            // Texture ID.  
-            public uint offsetToTex;   // Offset to texture from begining of file.
-            public uint textureSize;   // Size of texture.
+            public int id;            // Texture ID.  
+            public int offsetToTex;   // Offset to texture from begining of file.
+            public int textureSize;   // Size of texture.
             public CellGcmTexture tex;		// Texture structure defined in GCM library.
         }
 

@@ -14,9 +14,9 @@ namespace GTFDump
             return Convert.ToBoolean(format & CELL_GCM_TEXTURE_LN);
         }
 
-        public static uint gtfGetPitch(byte format, uint width)
+        public static int gtfGetPitch(byte format, int width)
         {
-            uint depth = 0;
+            int depth = 0;
             byte raw_format = gtfGetRawFormat(format);
             switch (raw_format)
             {
@@ -64,7 +64,7 @@ namespace GTFDump
                     break;
             }
 
-            uint pitch = width * depth;
+            int pitch = width * depth;
             if (raw_format == CELL_GCM_TEXTURE_COMPRESSED_DXT1)
             {
                 pitch = ((width + 3) / 4) * 8;
@@ -247,13 +247,13 @@ namespace GTFDump
             Console.WriteLine($"    Remap: {utilRemap2Str(tex.remap)} ({tex.remap.ToString("X4")})");
         }
 
-        public static string utilRemap2Str(uint remap)
+        public static string utilRemap2Str(int remap)
         {
             char[] strRemap = { 'A', 'R', 'G', 'B' };
 
             for (int i = 0; i < 4; ++i)
             {
-                uint src = (remap >> (i * 2)) & 0x3;
+                int src = (remap >> (i * 2)) & 0x3;
 
                 char c = 'N';
 
@@ -274,7 +274,7 @@ namespace GTFDump
                     c = 'B';
                 }
 
-                uint opp = (remap >> (i * 2 + 8)) & 0x3; // default: CELL_GCM_TEXTURE_REMAP_REMAP
+                int opp = (remap >> (i * 2 + 8)) & 0x3; // default: CELL_GCM_TEXTURE_REMAP_REMAP
                 if (opp == CELL_GCM_TEXTURE_REMAP_ZERO)
                 {
                     c = '0';

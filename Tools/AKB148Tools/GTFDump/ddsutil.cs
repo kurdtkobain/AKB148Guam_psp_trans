@@ -19,13 +19,13 @@ namespace GTFDump
                 Console.Write(String.Format("    Size: {0:d}x{1:d}\n", ddsh.width, ddsh.height));
             }
             {
-                uint mipmap = 0;
+                int mipmap = 0;
                 if (Convert.ToBoolean(ddsh.flags & DDSD_MIPMAPCOUNT))
                 {
                     mipmap = ddsh.mipMapCount;
                 }
 
-                uint cube = 0;
+                int cube = 0;
                 if (Convert.ToBoolean(ddsh.caps2 & DDSCAPS2_CUBEMAP))
                 {
                     if (Convert.ToBoolean(ddsh.caps2 & DDSCAPS2_CUBEMAP_POSITIVEX)) ++cube;
