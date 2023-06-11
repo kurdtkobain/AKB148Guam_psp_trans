@@ -1,16 +1,12 @@
 ﻿using MiscUtil.Conversion;
 using MiscUtil.IO;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace _2dcDump
 {
@@ -163,16 +159,25 @@ namespace _2dcDump
             CH2D.CH2DPLAN plan;
             foreach (string file in files)
             {
+                if(blacklist.Contains(Path.GetFileNameWithoutExtension(file)) || Path.GetFileNameWithoutExtension(file).StartsWith("tc") || Path.GetFileNameWithoutExtension(file).StartsWith("krm"))
+                {
+                    continue;
+                }
                 Console.WriteLine("Processing file: " + Path.GetFileNameWithoutExtension(file));
                 int imgnum = 0;
-                if (File.Exists("2dc/" + Path.GetFileNameWithoutExtension(file) + "/" + imgnum + ".png") || blacklist.Contains(Path.GetFileNameWithoutExtension(file)) || Path.GetFileNameWithoutExtension(file).StartsWith("tc") || Path.GetFileNameWithoutExtension(file).StartsWith("krm"))
+                string membernum = Path.GetFileNameWithoutExtension(file).Split('_')[0];
+                string eventnum = Path.GetFileNameWithoutExtension(file).Split('_')[1].Split('-')[0];
+                string posenum = Path.GetFileNameWithoutExtension(file).Split('_')[1].Split('-')[1];
+                string expnum = Path.GetFileNameWithoutExtension(file).Split('_')[1].Split('-')[2];
+                if (File.Exists($"2dc/{membernum}/{eventnum}/{posenum}/{expnum}" + "/" + imgnum + ".png") )
                 {
                     continue;
                 }
                 if (!Directory.Exists(Path.GetFileNameWithoutExtension(file)))
                 {
-                    Directory.CreateDirectory("2dc/" + Path.GetFileNameWithoutExtension(file));
+                    Directory.CreateDirectory($"2dc/{membernum}/{eventnum}/{posenum}/{expnum}");
                 }
+                
                 long pos;
                 using (EndianBinaryReader br = new EndianBinaryReader(EndianBitConverter.Big, new FileStream(file, FileMode.Open)))
                 {
@@ -206,11 +211,11 @@ namespace _2dcDump
                     long b4texi = br.BaseStream.Position;
                     if (ONLYDUMPINFO)
                     {
-                        if (File.Exists("2dc/" + Path.GetFileNameWithoutExtension(file) + "/" + Path.GetFileNameWithoutExtension(file) + ".nfo"))
+                        if (File.Exists($"2dc/{membernum}/{eventnum}/{posenum}/{expnum}" + "/" + Path.GetFileNameWithoutExtension(file) + ".nfo"))
                         {
-                            File.Delete("2dc/" + Path.GetFileNameWithoutExtension(file) + "/" + Path.GetFileNameWithoutExtension(file) + ".nfo");
+                            File.Delete($"2dc/{membernum}/{eventnum}/{posenum}/{expnum}" + "/" + Path.GetFileNameWithoutExtension(file) + ".nfo");
                         }
-                        using (StreamWriter fs = File.AppendText("2dc/" + Path.GetFileNameWithoutExtension(file) + "/" + Path.GetFileNameWithoutExtension(file) + ".nfo"))
+                        using (StreamWriter fs = File.AppendText($"2dc/{membernum}/{eventnum}/{posenum}/{expnum}" + "/" + Path.GetFileNameWithoutExtension(file) + ".nfo"))
                         {
                             fs.WriteLine(assString(CH2D.ENDIBIGE).Trim((char)0x00));
                             fs.WriteLine();
@@ -235,7 +240,7 @@ namespace _2dcDump
                     }
                     if (ONLYDUMPINFO)
                     {
-                        using (StreamWriter fs = File.AppendText("2dc/" + Path.GetFileNameWithoutExtension(file) + "/" + Path.GetFileNameWithoutExtension(file) + ".nfo"))
+                        using (StreamWriter fs = File.AppendText($"2dc/{membernum}/{eventnum}/{posenum}/{expnum}" + "/" + Path.GetFileNameWithoutExtension(file) + ".nfo"))
                         {
                             fs.WriteLine();
                             fs.WriteLine(texi.getInfoString());
@@ -249,7 +254,7 @@ namespace _2dcDump
 
                 if (ONLYDUMPINFO)
                 {
-                    using (StreamWriter fs = File.AppendText("2dc/" + Path.GetFileNameWithoutExtension(file) + "/" + Path.GetFileNameWithoutExtension(file) + ".nfo"))
+                    using (StreamWriter fs = File.AppendText($"2dc/{membernum}/{eventnum}/{posenum}/{expnum}" + "/" + Path.GetFileNameWithoutExtension(file) + ".nfo"))
                     {
                         fs.WriteLine();
                         fs.WriteLine(imgdata.getInfoString());
@@ -286,7 +291,7 @@ namespace _2dcDump
                     }
                     img.UnlockBits(data);
                     img.RotateFlip(RotateFlipType.RotateNoneFlipXY);
-                    img.Save("2dc/" + Path.GetFileNameWithoutExtension(file) + "/" + imgnum.ToString() + ".png", ImageFormat.Png);
+                    img.Save($"2dc/{membernum}/{eventnum}/{posenum}/{expnum}" + "/" + imgnum.ToString() + ".png", ImageFormat.Png);
                     imgnum++;
                     pos = br.BaseStream.Position;
                 }
@@ -296,7 +301,7 @@ namespace _2dcDump
                     {
                         if (ONLYDUMPINFO)
                         {
-                            using (StreamWriter fs = File.AppendText("2dc/" + Path.GetFileNameWithoutExtension(file) + "/" + Path.GetFileNameWithoutExtension(file) + ".nfo"))
+                            using (StreamWriter fs = File.AppendText($"2dc/{membernum}/{eventnum}/{posenum}/{expnum}" + "/" + Path.GetFileNameWithoutExtension(file) + ".nfo"))
                             {
                                 fs.WriteLine();
                                 fs.WriteLine("0x" + pos.ToString("X4") + " " + pos.ToString());
@@ -339,7 +344,7 @@ namespace _2dcDump
                         pos = br.BaseStream.Position;
                         if (ONLYDUMPINFO)
                         {
-                            using (StreamWriter fs = File.AppendText("2dc/" + Path.GetFileNameWithoutExtension(file) + "/" + Path.GetFileNameWithoutExtension(file) + ".nfo"))
+                            using (StreamWriter fs = File.AppendText($"2dc/{membernum}/{eventnum}/{posenum}/{expnum}" + "/" + Path.GetFileNameWithoutExtension(file) + ".nfo"))
                             {
                                 fs.WriteLine();
                                 fs.WriteLine(texi2.getInfoString());
@@ -354,7 +359,7 @@ namespace _2dcDump
                     {
                         if (ONLYDUMPINFO)
                         {
-                            using (StreamWriter fs = File.AppendText("2dc/" + Path.GetFileNameWithoutExtension(file) + "/" + Path.GetFileNameWithoutExtension(file) + ".nfo"))
+                            using (StreamWriter fs = File.AppendText($"2dc/{membernum}/{eventnum}/{posenum}/{expnum}" + "/" + Path.GetFileNameWithoutExtension(file) + ".nfo"))
                             {
                                 fs.WriteLine();
                                 fs.WriteLine(imgdata2.getInfoString());
@@ -384,12 +389,12 @@ namespace _2dcDump
                         }
                         img2.UnlockBits(data2);
                         img2.RotateFlip(RotateFlipType.RotateNoneFlipXY);
-                        img2.Save("2dc/" + Path.GetFileNameWithoutExtension(file) + "/" + imgnum.ToString() + ".png", ImageFormat.Png);
+                        img2.Save($"2dc/{membernum}/{eventnum}/{posenum}/{expnum}" + "/" + imgnum.ToString() + ".png", ImageFormat.Png);
                         imgnum++;
 
                         if (ONLYDUMPINFO)
                         {
-                            using (StreamWriter fs = File.AppendText("2dc/" + Path.GetFileNameWithoutExtension(file) + "/" + Path.GetFileNameWithoutExtension(file) + ".nfo"))
+                            using (StreamWriter fs = File.AppendText($"2dc/{membernum}/{eventnum}/{posenum}/{expnum}" + "/" + Path.GetFileNameWithoutExtension(file) + ".nfo"))
                             {
                                 fs.WriteLine();
                                 fs.WriteLine(br.BaseStream.Position.ToString("X4") + " " + br.BaseStream.Position.ToString());

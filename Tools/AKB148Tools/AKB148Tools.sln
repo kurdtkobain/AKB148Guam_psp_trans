@@ -22,8 +22,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "APKUnpack", "APKUnpack\APKU
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EndianBinaryReader", "EndianBinaryReader\EndianBinaryReader.csproj", "{4E6E3E08-0CF9-4548-BF0F-B10F793B3798}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASBTests", "ASBTests\ASBTests.csproj", "{6AE37BBE-8AE7-424F-AEA6-99FE2E5A46DE}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StoryTest", "StoryTest\StoryTest.csproj", "{C91D78B4-7171-43D2-B22E-F8761B12E688}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2dcDump", "2dcDump\2dcDump.csproj", "{D0281A38-78F7-4F1C-B27B-F66E2C8CE2F6}"
@@ -35,6 +33,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StoryTestPS3", "StoryTest\StoryTestPS3.csproj", "{67ECF58F-6024-4047-93BC-A86B3F447C54}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GTFDump", "GTFDump\GTFDump.csproj", "{16CD6155-8382-4B69-A0B6-CD7310BE7EA3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASBTests", "ASBTests\ASBTests.csproj", "{6AE37BBE-8AE7-424F-AEA6-99FE2E5A46DE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -70,10 +70,6 @@ Global
 		{4E6E3E08-0CF9-4548-BF0F-B10F793B3798}.Debug|x64.Build.0 = Debug|x64
 		{4E6E3E08-0CF9-4548-BF0F-B10F793B3798}.Release|x64.ActiveCfg = Release|x64
 		{4E6E3E08-0CF9-4548-BF0F-B10F793B3798}.Release|x64.Build.0 = Release|x64
-		{6AE37BBE-8AE7-424F-AEA6-99FE2E5A46DE}.Debug|x64.ActiveCfg = Debug|x64
-		{6AE37BBE-8AE7-424F-AEA6-99FE2E5A46DE}.Debug|x64.Build.0 = Debug|x64
-		{6AE37BBE-8AE7-424F-AEA6-99FE2E5A46DE}.Release|x64.ActiveCfg = Release|x64
-		{6AE37BBE-8AE7-424F-AEA6-99FE2E5A46DE}.Release|x64.Build.0 = Release|x64
 		{C91D78B4-7171-43D2-B22E-F8761B12E688}.Debug|x64.ActiveCfg = Debug|x64
 		{C91D78B4-7171-43D2-B22E-F8761B12E688}.Debug|x64.Build.0 = Debug|x64
 		{C91D78B4-7171-43D2-B22E-F8761B12E688}.Release|x64.ActiveCfg = Release|x64
@@ -97,6 +93,10 @@ Global
 		{16CD6155-8382-4B69-A0B6-CD7310BE7EA3}.Debug|x64.ActiveCfg = Debug|x64
 		{16CD6155-8382-4B69-A0B6-CD7310BE7EA3}.Debug|x64.Build.0 = Debug|x64
 		{16CD6155-8382-4B69-A0B6-CD7310BE7EA3}.Release|x64.ActiveCfg = Release|x64
+		{6AE37BBE-8AE7-424F-AEA6-99FE2E5A46DE}.Debug|x64.ActiveCfg = Debug|x64
+		{6AE37BBE-8AE7-424F-AEA6-99FE2E5A46DE}.Debug|x64.Build.0 = Debug|x64
+		{6AE37BBE-8AE7-424F-AEA6-99FE2E5A46DE}.Release|x64.ActiveCfg = Release|x64
+		{6AE37BBE-8AE7-424F-AEA6-99FE2E5A46DE}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
