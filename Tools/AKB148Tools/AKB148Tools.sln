@@ -34,6 +34,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "APKUnpackPS3", "APKUnpackPS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StoryTestPS3", "StoryTest\StoryTestPS3.csproj", "{67ECF58F-6024-4047-93BC-A86B3F447C54}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GTFDump", "GTFDump\GTFDump.csproj", "{16CD6155-8382-4B69-A0B6-CD7310BE7EA3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -92,6 +94,9 @@ Global
 		{67ECF58F-6024-4047-93BC-A86B3F447C54}.Debug|x64.Build.0 = Debug|x64
 		{67ECF58F-6024-4047-93BC-A86B3F447C54}.Release|x64.ActiveCfg = Release|x64
 		{67ECF58F-6024-4047-93BC-A86B3F447C54}.Release|x64.Build.0 = Release|x64
+		{16CD6155-8382-4B69-A0B6-CD7310BE7EA3}.Debug|x64.ActiveCfg = Debug|x64
+		{16CD6155-8382-4B69-A0B6-CD7310BE7EA3}.Debug|x64.Build.0 = Debug|x64
+		{16CD6155-8382-4B69-A0B6-CD7310BE7EA3}.Release|x64.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
