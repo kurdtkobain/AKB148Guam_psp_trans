@@ -36,6 +36,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GTFDump", "GTFDump\GTFDump.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASBTests", "ASBTests\ASBTests.csproj", "{6AE37BBE-8AE7-424F-AEA6-99FE2E5A46DE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JPEGA2PNG", "JPEGA2PNG\JPEGA2PNG.csproj", "{5DAAC764-AE60-48A3-B21C-65FDD008D322}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2DCPS3Dump", "2DCPS3Dump\2DCPS3Dump.csproj", "{74DEEA43-0B18-43BF-BE70-2D0FA5471B2A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -97,6 +101,12 @@ Global
 		{6AE37BBE-8AE7-424F-AEA6-99FE2E5A46DE}.Debug|x64.Build.0 = Debug|x64
 		{6AE37BBE-8AE7-424F-AEA6-99FE2E5A46DE}.Release|x64.ActiveCfg = Release|x64
 		{6AE37BBE-8AE7-424F-AEA6-99FE2E5A46DE}.Release|x64.Build.0 = Release|x64
+		{5DAAC764-AE60-48A3-B21C-65FDD008D322}.Debug|x64.ActiveCfg = Debug|x64
+		{5DAAC764-AE60-48A3-B21C-65FDD008D322}.Debug|x64.Build.0 = Debug|x64
+		{5DAAC764-AE60-48A3-B21C-65FDD008D322}.Release|x64.ActiveCfg = Release|x64
+		{74DEEA43-0B18-43BF-BE70-2D0FA5471B2A}.Debug|x64.ActiveCfg = Debug|x64
+		{74DEEA43-0B18-43BF-BE70-2D0FA5471B2A}.Debug|x64.Build.0 = Debug|x64
+		{74DEEA43-0B18-43BF-BE70-2D0FA5471B2A}.Release|x64.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
