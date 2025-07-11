@@ -50,18 +50,16 @@ namespace _2dcDump
             public byte[] tag = new byte[8];
             public int ukn1;
             public int ukn2;
-            public int ukn3;
-            public int ukn4;
-            public byte[] padding = new byte[8]; //always all 0xCC
+            public int numFiles;
+            public byte[] padding = new byte[12]; //always all 0xCC
 
             public CH2DHDET(EndianBinaryReader br)
             {
                 tag = br.ReadBytes(8);
                 ukn1 = br.ReadInt32();
                 ukn2 = br.ReadInt32();
-                ukn3 = br.ReadInt32();
-                ukn4 = br.ReadInt32();
-                padding = br.ReadBytes(8);
+                numFiles = br.ReadInt32();
+                padding = br.ReadBytes(12);
             }
 
             public string getInfoString()
@@ -70,8 +68,7 @@ namespace _2dcDump
                 ret.AppendLine(Encoding.ASCII.GetString(tag));
                 ret.AppendLine("0x" + ukn1.ToString("X4") + " " + ukn1.ToString());
                 ret.AppendLine("0x" + ukn2.ToString("X4") + " " + ukn2.ToString());
-                ret.AppendLine("0x" + ukn3.ToString("X4") + " " + ukn3.ToString());
-                ret.AppendLine("0x" + ukn4.ToString("X4") + " " + ukn4.ToString());
+                ret.AppendLine("0x" + numFiles.ToString("X4") + " " + numFiles.ToString());
                 ret.AppendLine(KAMY.Extensions.MiscExtensions.ToHexString(padding));
                 return ret.ToString();
             }
@@ -110,20 +107,22 @@ namespace _2dcDump
         {
             public byte[] tag = new byte[8];
             public int ukn1;
-            public byte[] poseId = new byte[13];
-            public byte[] padding = new byte[23]; //always all 0xCC
             public int ukn2;
+            public byte[] poseId = new byte[8];
+            public byte[] padding = new byte[24]; //always all 0xCC
             public int ukn3;
+            public int ukn4;
             public byte[] padding2 = new byte[8]; //always all 0xCC
 
             public CH2DPOSE(EndianBinaryReader br)
             {
                 tag = br.ReadBytes(8);
                 ukn1 = br.ReadInt32();
-                poseId = br.ReadBytes(13);
-                padding = br.ReadBytes(23);
                 ukn2 = br.ReadInt32();
+                poseId = br.ReadBytes(8);
+                padding = br.ReadBytes(24);
                 ukn3 = br.ReadInt32();
+                ukn4 = br.ReadInt32();
                 padding2 = br.ReadBytes(8);
             }
 
@@ -192,6 +191,10 @@ namespace _2dcDump
             public int diff;
             public int size2;
             public byte[] padding = new byte[12]; //always all 0xCC
+            public int x;
+            public int y;
+            public int beWidthM1; //width minus 1 in big endian???
+            public int beHeightM1; //height minus 1 in big endian???
 
             public CH2DTEXI(EndianBinaryReader br)
             {
@@ -200,6 +203,10 @@ namespace _2dcDump
                 diff = br.ReadInt32();
                 size2 = br.ReadInt32();
                 padding = br.ReadBytes(12);
+                x = br.ReadInt32();
+                y = br.ReadInt32();
+                beWidthM1 = br.ReadInt32();
+                beHeightM1 = br.ReadInt32();
 
             }
 
@@ -211,62 +218,13 @@ namespace _2dcDump
                 ret.AppendLine("0x" + diff.ToString("X4") + " " + diff.ToString());
                 ret.AppendLine("0x" + size2.ToString("X4") + " " + size2.ToString());
                 ret.AppendLine(KAMY.Extensions.MiscExtensions.ToHexString(padding));
+                ret.AppendLine("0x" + x.ToString("X4") + " " + x.ToString());
+                ret.AppendLine("0x" + y.ToString("X4") + " " + y.ToString());
+                ret.AppendLine("0x" + beWidthM1.ToString("X4") + " " + beWidthM1.ToString());
+                ret.AppendLine("0x" + beHeightM1.ToString("X4") + " " + beHeightM1.ToString());
                 return ret.ToString();
             }
 
-        }
-
-        public class IMGDATA
-        {
-            public long startpos;
-            public int zero1;
-            public int zero2;
-            public int ukn4;
-            public int ukn5;
-            public int ukn6;
-            public int ukn7;
-            public int ukn8;
-            public short width;
-            public short height;
-            public short end; //always 0x8080
-            public long endpos;
-            public IMGDATA(string file, in long pos, out long pos2)
-            {
-                using (EndianBinaryReader br2 = new EndianBinaryReader(EndianBitConverter.Little, new FileStream(file, FileMode.Open)))
-                {
-                    br2.BaseStream.Position = startpos = pos;
-                    zero1 = br2.ReadInt32();
-                    zero2 = br2.ReadInt32();
-                    ukn4 = br2.ReadInt32();
-                    ukn5 = br2.ReadInt32();
-                    ukn6 = br2.ReadInt32();
-                    ukn7 = br2.ReadInt32();
-                    ukn8 = br2.ReadInt32();
-                    width = br2.ReadInt16();
-                    height = br2.ReadInt16();
-                    end = br2.ReadInt16();
-                    pos2 = endpos = br2.BaseStream.Position;
-                }
-            }
-
-            public string getInfoString()
-            {
-                StringBuilder ret = new StringBuilder();
-                ret.AppendLine("IMGDATA");
-                ret.AppendLine("0x" + startpos.ToString("X4") + " " + startpos.ToString());
-                ret.AppendLine("0x" + zero1.ToString("X4"));
-                ret.AppendLine("0x" + zero2.ToString("X4"));
-                ret.AppendLine("0x" + ukn4.ToString("X4") + " " + ukn4.ToString());
-                ret.AppendLine("0x" + ukn5.ToString("X4") + " " + ukn5.ToString());
-                ret.AppendLine("0x" + ukn6.ToString("X4") + " " + ukn6.ToString());
-                ret.AppendLine("0x" + ukn7.ToString("X4") + " " + ukn7.ToString());
-                ret.AppendLine("0x" + ukn8.ToString("X4") + " " + ukn8.ToString());
-                ret.AppendLine(width.ToString());
-                ret.AppendLine(height.ToString());
-                ret.AppendLine("0x" + end.ToString("X4") + " " + end.ToString());
-                ret.AppendLine("0x" + endpos.ToString("X4") + " " + endpos.ToString());
-                return ret.ToString();
-            }
         }
     }
 }

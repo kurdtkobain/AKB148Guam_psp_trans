@@ -67,11 +67,11 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="bitmap.cs" />
     <Compile Include="CH2D.cs" />
     <Compile Include="Misc.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TGASharp.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

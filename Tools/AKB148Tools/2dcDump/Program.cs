@@ -1,47 +1,25 @@
 ﻿using MiscUtil.Conversion;
 using MiscUtil.IO;
 using System;
+using System.Collections.Concurrent;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using TGASharpLib;
 
 namespace _2dcDump
 {
     internal class Program
     {
-        public static ColorPalette GetPalette(EndianBinaryReader br, System.Drawing.Image image)
-        {
-            ColorPalette colors = image.Palette;
-            for (int i = 0; i < 256; i++)
-            {
-                byte b = br.ReadByte();
-                byte g = br.ReadByte();
-                byte r = br.ReadByte();
-                byte a = br.ReadByte();
-
-                colors.Entries[i] = Color.FromArgb(a, r, g, b);
-            }
-            return colors;
-        }
-
-        public static int GetImageWidth(EndianBinaryReader br)
-        {
-            int ret;
-
-            br.BaseStream.Position = 0x14c;
-            ret = br.ReadUInt16();
-            return ret;
-        }
-
         public static string assString(byte[] bytes)
         {
             return Encoding.ASCII.GetString(bytes);
         }
 
-        static string[] blacklist = new string[]
+        static string[] blacklist = new string[] //Files have GIM data
         {
             "15_00-01-01",
             "15_00-01-03",
@@ -159,7 +137,7 @@ namespace _2dcDump
             CH2D.CH2DPLAN plan;
             foreach (string file in files)
             {
-                if(blacklist.Contains(Path.GetFileNameWithoutExtension(file)) || Path.GetFileNameWithoutExtension(file).StartsWith("tc") || Path.GetFileNameWithoutExtension(file).StartsWith("krm"))
+                if (blacklist.Contains(Path.GetFileNameWithoutExtension(file)) || Path.GetFileNameWithoutExtension(file).StartsWith("tc") || Path.GetFileNameWithoutExtension(file).StartsWith("krm"))
                 {
                     continue;
                 }
@@ -169,7 +147,7 @@ namespace _2dcDump
                 string eventnum = Path.GetFileNameWithoutExtension(file).Split('_')[1].Split('-')[0];
                 string posenum = Path.GetFileNameWithoutExtension(file).Split('_')[1].Split('-')[1];
                 string expnum = Path.GetFileNameWithoutExtension(file).Split('_')[1].Split('-')[2];
-                if (File.Exists($"2dc/{membernum}/{eventnum}/{posenum}/{expnum}" + "/" + imgnum + ".png") )
+                if (File.Exists($"2dc/{membernum}/{eventnum}/{posenum}/{expnum}" + "/" + imgnum + ".png"))
                 {
                     continue;
                 }
@@ -177,7 +155,7 @@ namespace _2dcDump
                 {
                     Directory.CreateDirectory($"2dc/{membernum}/{eventnum}/{posenum}/{expnum}");
                 }
-                
+
                 long pos;
                 using (EndianBinaryReader br = new EndianBinaryReader(EndianBitConverter.Big, new FileStream(file, FileMode.Open)))
                 {
@@ -233,176 +211,54 @@ namespace _2dcDump
                         }
 
                     }
-                    CH2D.CH2DTEXI texi = new CH2D.CH2DTEXI(br);
-                    if (Encoding.ASCII.GetString(texi.tag) != "CH2DTEXI")
+
+                    for (int i = 0; i <= hdet.numFiles-1; i++)
                     {
-                        throw new Exception("WRONG TAG: CH2DTEXI");
-                    }
-                    if (ONLYDUMPINFO)
-                    {
-                        using (StreamWriter fs = File.AppendText($"2dc/{membernum}/{eventnum}/{posenum}/{expnum}" + "/" + Path.GetFileNameWithoutExtension(file) + ".nfo"))
+                        CH2D.CH2DTEXI texi = new CH2D.CH2DTEXI(br);
+                        if (Encoding.ASCII.GetString(texi.tag) != "CH2DTEXI")
                         {
-                            fs.WriteLine();
-                            fs.WriteLine(texi.getInfoString());
+                            throw new Exception("WRONG TAG: CH2DTEXI");
                         }
-
-                    }
-
-                    pos = br.BaseStream.Position;
-                }
-                CH2D.IMGDATA imgdata = new CH2D.IMGDATA(file, in pos, out pos);
-
-                if (ONLYDUMPINFO)
-                {
-                    using (StreamWriter fs = File.AppendText($"2dc/{membernum}/{eventnum}/{posenum}/{expnum}" + "/" + Path.GetFileNameWithoutExtension(file) + ".nfo"))
-                    {
-                        fs.WriteLine();
-                        fs.WriteLine(imgdata.getInfoString());
-                    }
-
-                }
-
-                using (EndianBinaryReader br = new EndianBinaryReader(EndianBitConverter.Big, new FileStream(file, FileMode.Open)))
-                {
-                    if (imgdata.width == 0 || imgdata.height == 0)
-                    {
-                        using (StreamWriter fs = File.CreateText("error.log"))
-                        {
-                            fs.WriteLine(("\"" + file + "\",").Replace("\\", "\\\\"));
-                        }
-                        continue;
-                    }
-                    br.BaseStream.Position = pos;
-                    Bitmap img = new Bitmap(imgdata.width, imgdata.height, PixelFormat.Format8bppIndexed);
-                    ColorPalette pal = GetPalette(br, img);
-                    pal.Entries[0] = Color.Transparent;
-                    img.Palette = pal;
-                    BitmapData data = img.LockBits(new Rectangle(0, 0, imgdata.width, imgdata.height), ImageLockMode.ReadWrite, img.PixelFormat);
-                    IntPtr scan0 = data.Scan0;
-                    for (int i = 0; i < img.Height; i++)
-                    {
-                        byte[] rowPixels = new byte[img.Width];
-                        for (int j = 0; j < img.Width; j++)
-                        {
-                            rowPixels[j] = br.ReadByte();
-                        }
-                        Marshal.Copy(rowPixels, 0, scan0, rowPixels.Length);
-                        scan0 = new IntPtr(scan0.ToInt64() + data.Stride);
-                    }
-                    img.UnlockBits(data);
-                    img.RotateFlip(RotateFlipType.RotateNoneFlipXY);
-                    img.Save($"2dc/{membernum}/{eventnum}/{posenum}/{expnum}" + "/" + imgnum.ToString() + ".png", ImageFormat.Png);
-                    imgnum++;
-                    pos = br.BaseStream.Position;
-                }
-                while (true)
-                {
-                    using (EndianBinaryReader br = new EndianBinaryReader( EndianBitConverter.Big, new FileStream(file, FileMode.Open)))
-                    {
                         if (ONLYDUMPINFO)
                         {
                             using (StreamWriter fs = File.AppendText($"2dc/{membernum}/{eventnum}/{posenum}/{expnum}" + "/" + Path.GetFileNameWithoutExtension(file) + ".nfo"))
                             {
                                 fs.WriteLine();
-                                fs.WriteLine("0x" + pos.ToString("X4") + " " + pos.ToString());
-                                fs.WriteLine();
-                                fs.WriteLine("0x" + (pos + 30).ToString("X4") + " " + (pos + 30).ToString());
+                                fs.WriteLine(texi.getInfoString());
                             }
 
                         }
-                        br.BaseStream.Position = pos;
-                        byte[] tmp = br.ReadBytes(30); // ??????all 0x00????
-                        if (tmp.Length < 30)
-                            break;
-
-                        if (tmp[29] == 0x47 || tmp[28] == 0x47)
+                        var comp = br.ReadBytes(3);
+                        if (comp[0] == 0x4D && comp[1] == 0x49 && comp[2] == 0x47) // dammit GIM
                         {
-                            break;
-                        }
-
-                        if ( Encoding.ASCII.GetString(tmp).Contains("GENEEOF"))
-                        {
-                            break;
-                        }
-                        if(br.ReadByte() == 0x47)
-                        {
-                            break;
+                            br.BaseStream.Position -= 3;
+                            br.BaseStream.Position += texi.size2;
+                            var currentpos = br.BaseStream.Position;
+                            if ((currentpos + 24) < br.BaseStream.Length)
+                            {
+                                br.BaseStream.Position += 24;
+                            }
+                            else
+                            {
+                                break;
+                            }
                         }
                         else
                         {
-                            br.BaseStream.Position--;
-                        }
-                        if (br.BaseStream.Length - br.BaseStream.Position < 32)
-                        {
-                            break;
-                        }
-                        CH2D.CH2DTEXI texi2 = new CH2D.CH2DTEXI(br);
-                        if (Encoding.ASCII.GetString(texi2.tag) != "CH2DTEXI")
-                        {
-                            break;
-                        }
-                        pos = br.BaseStream.Position;
-                        if (ONLYDUMPINFO)
-                        {
-                            using (StreamWriter fs = File.AppendText($"2dc/{membernum}/{eventnum}/{posenum}/{expnum}" + "/" + Path.GetFileNameWithoutExtension(file) + ".nfo"))
+                            br.BaseStream.Position -= 3;
+                            var image = (TGASharpLib.TGA.FromBytes(br.ReadBytes(texi.size2))).ToBitmap(true);
+                            image.MakeTransparent();
+                            image.Save($"2dc/{membernum}/{eventnum}/{posenum}/{expnum}" + "/" + i.ToString() + ".png", ImageFormat.Png);
+                            var currentpos = br.BaseStream.Position;
+                            if ((currentpos + 30) < br.BaseStream.Length)
                             {
-                                fs.WriteLine();
-                                fs.WriteLine(texi2.getInfoString());
+                                br.ReadBytes(30);
                             }
-
-                        }
-
-                    }
-                    CH2D.IMGDATA imgdata2 = new CH2D.IMGDATA(file, in pos, out pos);
-
-                    using (EndianBinaryReader br = new EndianBinaryReader(EndianBitConverter.Big, new FileStream(file, FileMode.Open)))
-                    {
-                        if (ONLYDUMPINFO)
-                        {
-                            using (StreamWriter fs = File.AppendText($"2dc/{membernum}/{eventnum}/{posenum}/{expnum}" + "/" + Path.GetFileNameWithoutExtension(file) + ".nfo"))
+                            else
                             {
-                                fs.WriteLine();
-                                fs.WriteLine(imgdata2.getInfoString());
+                                break;
                             }
-
                         }
-                        if (imgdata2.width == 0 || imgdata2.height == 0)
-                        {
-                            break;
-                        }
-                        br.BaseStream.Position = pos;
-                        Bitmap img2 = new Bitmap(imgdata2.width, imgdata2.height, PixelFormat.Format8bppIndexed);
-                        ColorPalette pal2 = GetPalette(br, img2);
-                        pal2.Entries[0] = Color.Transparent;
-                        img2.Palette = pal2;
-                        BitmapData data2 = img2.LockBits(new Rectangle(0, 0, imgdata2.width, imgdata2.height), ImageLockMode.ReadWrite, img2.PixelFormat);
-                        IntPtr scan02 = data2.Scan0;
-                        for (int i = 0; i < img2.Height; i++)
-                        {
-                            byte[] rowPixels2 = new byte[img2.Width];
-                            for (int j = 0; j < img2.Width; j++)
-                            {
-                                rowPixels2[j] = br.ReadByte();
-                            }
-                            Marshal.Copy(rowPixels2, 0, scan02, rowPixels2.Length);
-                            scan02 = new IntPtr(scan02.ToInt64() + data2.Stride);
-                        }
-                        img2.UnlockBits(data2);
-                        img2.RotateFlip(RotateFlipType.RotateNoneFlipXY);
-                        img2.Save($"2dc/{membernum}/{eventnum}/{posenum}/{expnum}" + "/" + imgnum.ToString() + ".png", ImageFormat.Png);
-                        imgnum++;
-
-                        if (ONLYDUMPINFO)
-                        {
-                            using (StreamWriter fs = File.AppendText($"2dc/{membernum}/{eventnum}/{posenum}/{expnum}" + "/" + Path.GetFileNameWithoutExtension(file) + ".nfo"))
-                            {
-                                fs.WriteLine();
-                                fs.WriteLine(br.BaseStream.Position.ToString("X4") + " " + br.BaseStream.Position.ToString());
-
-                            }
-
-                        }
-                        pos = br.BaseStream.Position;
                     }
                 }
             }
