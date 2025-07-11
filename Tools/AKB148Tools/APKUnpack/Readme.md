@@ -1,3 +1,3 @@
-﻿Based on http://aluigi.altervista.org/papers/bms/others/dragon_ball_z_boz.bms
+﻿Based on http://aluigi.altervista.org/papers/bms/others/dragon_ball_z_boz.bms and https://github.com/FanTranslatorsInternational/Kuriimu2/blob/imgui/plugins/BandaiNamco/plugin_bandai_namco/Archives/ApkSupport.cs
 
-Ported to C# with lots of fixes to work with AKB 1/48: Idol to Guam de Koishitara PSP
+works with AKB48 game on PSP,PSVita, and PS3
