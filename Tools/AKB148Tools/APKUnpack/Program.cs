@@ -13,61 +13,12 @@ using System.IO;
 using System.IO.Compression;
 using System.Text;
 using System.Windows.Forms;
+using static APKUnpack.APK;
 
 namespace APKUnpack
 {
     internal class Program
     {
-        private class GENESTRT
-        {
-            public long offset;
-            public long stringcnt;
-            public long[] nameofflist;
-            public long names_off;
-            public string[] stringlist;
-        }
-
-        private class PACKHEDR
-        {
-            public long headerSize;
-            public long dummy;
-            public long zero;
-            public long dummySize;
-            public long dummy2;
-            public string dummyFill;
-        }
-
-        private class PACKTOC
-        {
-            public long headerSize;
-            public long TOCoffset;
-            public int entrySize;
-            public long count;
-            public uint offset;
-            public long zero;
-        }
-
-        private class PACKTOCENTRY
-        {
-            public int flags;
-            public int stringIndex;
-            public int headerIndex;
-            public int zero0;
-            public uint offset;
-            public int count;
-            public long decompSize;
-            public long compSize;
-        }
-
-        private class PACKFSLS
-        {
-            public long headerSize;
-            public long headerOffset;
-            public long archives;
-            public long dummy;
-            public long dummy2;
-            public long zero;
-        }
 
         [STAThread]
         private static int Main(string[] args)
@@ -111,68 +62,21 @@ namespace APKUnpack
             using (EndianBinaryReader reader = new EndianBinaryReader(EndianBitConverter.Little, File.Open(infile, FileMode.Open)))
             {
                 reader.ReadBytes(16); //"ENDILTLE"
-                if (Encoding.ASCII.GetString(reader.ReadBytes(8)) != "PACKHEDR")
-                {
-                    return -1;
-                }
-                PACKHEDR pkhdr = new PACKHEDR();
-                pkhdr.headerSize = reader.ReadInt64();
-                pkhdr.dummy = reader.ReadInt32();
-                pkhdr.zero = reader.ReadInt32();
-                pkhdr.dummySize = reader.ReadInt32();
-                pkhdr.dummy2 = reader.ReadInt32();
-                pkhdr.dummyFill = Encoding.ASCII.GetString(reader.ReadBytes(16));
-                if (Encoding.ASCII.GetString(reader.ReadBytes(8)) != "PACKTOC ")
-                {
-                    return -1;
-                }
-                PACKTOC pktoc = new PACKTOC();
-                pktoc.headerSize = reader.ReadInt64();
-                pktoc.TOCoffset = reader.BaseStream.Position;
-                pktoc.entrySize = reader.ReadInt32();
-                pktoc.count = reader.ReadInt32();
-                pktoc.offset = reader.ReadUInt32();
-                pktoc.zero = reader.ReadInt32();
-                List<PACKTOCENTRY> entries = new List<PACKTOCENTRY>();
-                //reader.BaseStream.Position = pktoc.TOCoffset;
-                for (int l = 0; l < pktoc.count; l++)
-                {
-                    var entry = new PACKTOCENTRY();
-                    //long tocpos = reader.BaseStream.Position;
-                    entry.flags = reader.ReadInt32(); //always 0x200 (512)
-                    entry.stringIndex = reader.ReadInt32();
-                    entry.headerIndex = reader.ReadInt32(); //always 0
-                    entry.zero0 = reader.ReadInt32(); //always 0
-                    entry.offset = reader.ReadUInt32();
-                    entry.count = reader.ReadInt32();
-                    entry.decompSize = reader.ReadInt64();
-                    entry.compSize = reader.ReadInt64();
-                    entries.Add(entry);
-                }
+                PACKHEDR pkhdr = new PACKHEDR(reader);
+                PACKTOC pktoc = new PACKTOC(reader);
                 reader.BaseStream.Position = pktoc.TOCoffset + pktoc.headerSize;
-                if (Encoding.ASCII.GetString(reader.ReadBytes(8)) != "PACKFSLS")
-                {
-                    return -1;
-                }
-                PACKFSLS pkfls = new PACKFSLS();
-                pkfls.headerSize = reader.ReadInt64();
-                pkfls.headerOffset = reader.BaseStream.Position;
-                pkfls.dummy = reader.ReadInt32();
-                pkfls.archives = reader.ReadInt32();
-                pkfls.dummy2 = reader.ReadInt32();
-                pkfls.zero = reader.ReadInt32();
-                GENESTRT gene1 = GetGENESTRT(reader);
+                PACKFSLS pkfls = new PACKFSLS(reader);
 
-                foreach (var entry in entries)
+                foreach (var entry in pktoc.entries)
                 {
-                    Console.WriteLine("TOC flags: {4} file: {0}  offset: {1}  size: {2}  zsize: {3}", gene1.stringlist[entry.stringIndex], entry.offset, entry.decompSize, entry.compSize, entry.flags.ToString("X4"));
+                    Console.WriteLine("TOC flags: {4} file: {0}  offset: {1}  size: {2}  zsize: {3}", pkfls.strList.stringlist[entry.stringIndex], entry.offset, entry.decompSize, entry.compSize, entry.flags.ToString("X4"));
                     if (entry.flags == 0x01)//directory
                     {
                         continue;
                     }
                     else
                     {
-                        extractArchives(reader, entry, gene1, outfol);
+                        extractArchives(reader, entry, pkfls.strList, outfol);
                     }
                 }
             }
@@ -192,8 +96,10 @@ namespace APKUnpack
             {
                 return;
             }
+            bread.BaseStream.Position = entry.offset;
             if (entry.flags == 0x0300)
             {
+                
                 using (MemoryStream tmpmemstrm = new MemoryStream(bread.ReadBytes((int)entry.compSize)))
                 {
                     DecompressWriteAsync(tmpmemstrm, outfol, sortFol + "\\" + fname);//why async ¯\(°_°)/¯ cuz I like the word.......
@@ -213,50 +119,6 @@ namespace APKUnpack
                     nfstrm.WriteAsync(bread.ReadBytes((int)entry.decompSize), 0, (int)entry.decompSize);//why async ¯\(°_°)/¯ cuz I like the word.......
                 }
             }
-        }
-
-        private static GENESTRT GetGENESTRT(EndianBinaryReader br)
-        {
-            GENESTRT genetmp = new GENESTRT();
-            if (Encoding.ASCII.GetString(br.ReadBytes(8)) != "GENESTRT")
-            {
-                throw new Exception();
-            }
-            br.ReadInt32();
-            br.ReadInt32();
-            long headend = br.BaseStream.Position;
-            genetmp.stringcnt = br.ReadInt32();
-            br.ReadInt32();
-            long genehsize = br.ReadInt32();
-            br.ReadInt32();
-            genetmp.nameofflist = new long[genetmp.stringcnt];
-            for (int i = 0; i < genetmp.stringcnt; i++)
-            {
-                genetmp.nameofflist[i] = br.ReadInt32();
-            }
-            br.BaseStream.Position = headend + genehsize;
-            genetmp.names_off = br.BaseStream.Position;
-            genetmp.stringlist = new string[genetmp.stringcnt];
-            for (int j = 0; j < genetmp.stringcnt; j++)
-            {
-                genetmp.stringlist[j] = ReadStringZ(br);
-            }
-            return genetmp;
-        }
-
-        public static string ReadStringZ(EndianBinaryReader reader)
-        {
-            string result = "";
-            char c;
-            for (int i = 0; i < 255; i++)
-            {
-                if ((c = (char)reader.ReadByte()) == 0)
-                {
-                    break;
-                }
-                result += c.ToString();
-            }
-            return result;
         }
 
         private static void DecompressWriteAsync(MemoryStream ms, string path, string f_name)
